@@ -17,3 +17,26 @@ exports.postKatagori = async (req,res)=>{
 
     }
 }
+
+exports.putKategori = async (req,res)=>{
+    try{
+        const {nama_kategori,tipe,id} = req.body
+        const sql = "UPDATE tb_kategori SET nama_kategori = ?,tipe = ? WHERE id = ?";
+        const [fields] = await db.execute(sql,[nama_kategori,tipe,id])
+        response(200,fields,"data berhasil diperbarui",res)
+    }catch(err){
+        response(500,null,err,res)
+
+    }
+}
+
+exports.deleteKategori = async (req,res)=>{
+    try{
+        const {id} = req.body
+        const sql = "DELETE FROM tb_Kategori WHERE id = ?"
+        const [result] = await db.execute(sql,[id])
+        response(200,result,"sukses",res)
+    }catch(err){
+        response(500,err,"gagal",res)
+    }
+}

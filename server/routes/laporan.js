@@ -1,8 +1,10 @@
 const express = require("express")
 const router = express.Router()
 
-const {postLaporan} = require("../controllers/laporanController")
+const {postLaporan,putLaporan,deletelaporan} = require("../controllers/laporanController")
 
 router.post("/",postLaporan)
+router.put('/',putLaporan)
+router.delete("/",deletelaporan)
 
 module.exports = router

@@ -45,14 +45,13 @@ exports.putUsers = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.body;
-    const sql = "DELETE FROM tb_users WHERE id = ?";
-    const [fields] = await db.execute(sql, [id]);
+    const [result] = await db.execute("DELETE FROM tb_users WHERE id = ?", [id]);
     const data = {
-      isSuccess: fields.affectedRows,
-      id: fields.insertId,
+      isSuccess: result.affectedRows > 0,
+      deletedCount: result.affectedRows
     };
-    res.send(data);
-    // response(200, data, "data berhasil dihapus", res);
+
+    response(200, data, "Data berhasil dihapus", res);
   } catch (err) {
     res.send(err);
     response(500, err, "data gagal dihapus", res);
