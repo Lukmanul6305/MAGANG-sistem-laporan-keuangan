@@ -7,18 +7,17 @@ const response = require("./utils/response");
 app.use(express.json());
 
 const routes = [
-  {path: "/users",route: require("./routes/users") },
-  {path: "/kategori",route: require("./routes/kategori")},
-  {path: "/transaksi",route: require("./routes/transaksi")},
-  {path: "/laporan",route : require("./routes/laporan")}
-]
+  { path: "/users", route: require("./routes/users") },
+  { path: "/kategori", route: require("./routes/kategori") },
+  { path: "/transaksi", route: require("./routes/transaksi") },
+  { path: "/laporan", route: require("./routes/laporan") },
+];
 
-routes.forEach(r => app.use(`/api${r.path}`, r.route)); 
+routes.forEach((r) => app.use(`/api${r.path}`, r.route));
 
 app.listen(port, () => {
-  console.log(`website conneted port ${port}`)
+  console.log(`website conneted port ${port}`);
 });
-
 
 // const usersRoute = require("./routes/users");
 // const kategoriRoute = require("./routes/kategori");
@@ -31,14 +30,14 @@ app.listen(port, () => {
 // app.use("/api", laporanRoute)
 
 // app.get('/',async (req,res)=>{
-  //   try{
-  //     const sql = 'SHOW TABLES'
-  //     const [fields] = await db.query(sql)
-  //     response(200,fields,"berhasil",res)
-  //   }catch(err){
-  //     console.log(err)
-  //   }
-  // })
+//   try{
+//     const sql = 'SHOW TABLES'
+//     const [fields] = await db.query(sql)
+//     response(200,fields,"berhasil",res)
+//   }catch(err){
+//     console.log(err)
+//   }
+// })
 
 // app.post("/kategori", (req, res) => {
 //   const { nama_kategori, tipe } = req.body;
