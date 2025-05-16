@@ -1,5 +1,6 @@
 const db = require("../../database/connection");
 const response = require("../utils/response");
+const bcrypt = require("bcrypt");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -12,11 +13,12 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.postUsers = async (req, res) => {
+  const { username, email, password } = req.body;
+  const created_at = new Date();
   try {
-    const { username, email, password } = req.body;
-    const created_at = new Date();
+    const hashePassword = await bcrypt.hash(password, 10);
     const sql = "INSERT INTO tb_users(username,email,password,created_at) VALUES(?,?,?,?)";
-    const [result] = await db.execute(sql, [username, email, password, created_at]);
+    const [result] = await db.execute(sql, [username, email, hashePassword, created_at]);
     const data = {
       isSuccess: result.affectedRows,
       id: result.insertId,
@@ -48,7 +50,7 @@ exports.deleteUser = async (req, res) => {
     const [result] = await db.execute("DELETE FROM tb_users WHERE id = ?", [id]);
     const data = {
       isSuccess: result.affectedRows > 0,
-      deletedCount: result.affectedRows
+      deletedCount: result.affectedRows,
     };
 
     response(200, data, "Data berhasil dihapus", res);
