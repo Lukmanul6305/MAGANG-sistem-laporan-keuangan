@@ -1,8 +1,10 @@
 const express = require("express");
+const db = require("../database/connection");
+const dotenv = require("dotenv");
+
+dotenv.config();
 const app = express();
 const port = 3000;
-const db = require("../database/connection");
-const response = require("./utils/response");
 
 app.use(express.json());
 

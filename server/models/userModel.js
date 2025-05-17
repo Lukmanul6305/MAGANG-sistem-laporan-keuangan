@@ -1,21 +1,25 @@
-const  { DataTypes } = require("sequelize")
-const db = require("../../database/sequelize")
+const { sequelize, DataTypes } = require("sequelize");
+const db = require("../../database/sequelize");
 
-const user = db.define("tb_users",{
-    username :{
-        type : DataTypes.STRING,
+const user = db.define(
+  "tb_users",
+  {
+    username: {
+      type: DataTypes.STRING,
     },
-    email :{
-        type : DataTypes.STRING,
+    email: {
+      type: DataTypes.STRING,
     },
-    password :{
-        type : DataTypes.STRING,
+    password: {
+      type: DataTypes.STRING,
     },
-    refresh_token :{
-        type : DataTypes.TEXT,
+    refresh_token: {
+      type: DataTypes.TEXT,
     },
-},{
-    freezeTableName:true,
-})
+  },
+  {
+    freezeTableName: true,
+  }
+);
 
-module.exports = user
+module.exports = user;
