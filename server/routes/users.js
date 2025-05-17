@@ -2,11 +2,14 @@ const express = require("express");
 const router = express.Router();
 const validateUser = require("../middlewares/validateUser");
 
-const { postUsers, putUsers, deleteUser, login } = require("../controllers/userController");
+const { putUsers, deleteUser} = require("../controllers/userController");
+const { Registrasi,login, getUsers} = require("../controllers/authController");
+const { verifyToken } = require("../middlewares/VerifyToken")
 
-// router.get("/", getAllUsers);
-router.post("/", validateUser, postUsers);
-router.post("/login", login);
+router.get("/users", verifyToken ,getUsers );
+
+router.post("/registrasi", validateUser, Registrasi);
+router.post("/login" ,login);
 
 router.put("/", putUsers);
 router.delete("/", deleteUser);

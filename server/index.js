@@ -9,7 +9,7 @@ const port = 3000;
 app.use(express.json());
 
 const routes = [
-  { path: "/users", route: require("./routes/users") },
+  { path: "/", route: require("./routes/users") },
   { path: "/kategori", route: require("./routes/kategori") },
   { path: "/transaksi", route: require("./routes/transaksi") },
   { path: "/laporan", route: require("./routes/laporan") },

@@ -1,7 +1,7 @@
 const { sequelize, DataTypes } = require("sequelize");
 const db = require("../../database/sequelize");
 
-const user = db.define(
+const Users = db.define(
   "tb_users",
   {
     username: {
@@ -19,7 +19,8 @@ const user = db.define(
   },
   {
     freezeTableName: true,
+    timestamps: false
   }
 );
 
-module.exports = user;
+module.exports = Users;
