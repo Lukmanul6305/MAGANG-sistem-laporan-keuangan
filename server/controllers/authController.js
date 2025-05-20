@@ -69,9 +69,9 @@ exports.login = async (req, res) => {
     });
     res.json({ accessToken });
   } catch (err) {
-    // res.status(404).json({ msg: "email tidak ditemukan" });
-    console.log(err);
-    response(400, err, "email tidak ditemukan", res);
+    res.status(404).json({ msg: "email tidak ditemukan" });
+    // console.log(err);
+    // response(400, err, "email tidak ditemukan", res);
   }
 };
 

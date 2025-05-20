@@ -1,5 +1,5 @@
 const express = require("express");
-// const db = require("../database/connection");
+const db = require("../database/connection");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 const port = 5000;
 
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -20,6 +20,8 @@ const routes = [
 ];
 
 routes.forEach((r) => app.use(`/api${r.path}`, r.route));
+
+
 
 app.listen(port, () => {
   console.log(`website conneted port ${port}`);
@@ -35,15 +37,7 @@ app.listen(port, () => {
 // app.use("/api", transaksiRoute)
 // app.use("/api", laporanRoute)
 
-// app.get('/',async (req,res)=>{
-//   try{
-//     const sql = 'SHOW TABLES'
-//     const [fields] = await db.query(sql)
-//     response(200,fields,"berhasil",res)
-//   }catch(err){
-//     console.log(err)
-//   }
-// })
+
 
 // app.post("/kategori", (req, res) => {
 //   const { nama_kategori, tipe } = req.body;
