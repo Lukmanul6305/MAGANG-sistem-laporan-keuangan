@@ -1,20 +1,19 @@
-const Users = require("../models/userModel")
-const bcrypt = require("bcrypt")
-const db = require("../../database/connection") //ganti aja
-const response = require("../utils/response")
-const jwt = require("jsonwebtoken")
+const Users = require("../models/userModel");
+const bcrypt = require("bcrypt");
+const db = require("../../database/connection"); //ganti aja
+const response = require("../utils/response");
+const jwt = require("jsonwebtoken");
 
-
-exports.getUsers = async(req,res)=>{
-    try{
-        const user = await Users.findAll({
-          attributes:['id','username','email']
-        });
-        res.json(user)
-    }catch(err){
-        console.log(err)
-    }
-}
+exports.getUsers = async (req, res) => {
+  try {
+    const user = await Users.findOne({
+      attributes: ["id", "username", "email"],
+    });
+    res.json(user);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 exports.Registrasi = async (req, res) => {
   const { username, email, password, confPassword } = req.body;
@@ -26,7 +25,7 @@ exports.Registrasi = async (req, res) => {
   const hashPassword = await bcrypt.hash(password, salt);
   try {
     const sql = "INSERT INTO tb_users(username,email,password,created_at) VALUES(?,?,?,?)";
-    const [result] = await db.execute(sql, [username, email, hashPassword, created_at,]);
+    const [result] = await db.execute(sql, [username, email, hashPassword, created_at]);
     const data = {
       isSuccess: result.affectedRows,
       id: result.insertId,
@@ -55,7 +54,7 @@ exports.login = async (req, res) => {
     const refreshToken = jwt.sign({ userId, name, email }, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: "1d",
     });
-    const coba = await Users.update(
+    await Users.update(
       { refresh_token: refreshToken },
       {
         where: {
@@ -76,3 +75,24 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.logout = async (req, res) => {
+  const refreshToken = req.cookies.refreshtoken;
+  if (!refreshToken) return res.sendStatus(204);
+  const user = await Users.findAll({
+    where: {
+      refresh_token: refreshToken,
+    },
+  });
+  if (!user[0]) return res.sendStatus(204);
+  const userId = user[0].id;
+  await Users.update(
+    { refresh_token: null },
+    {
+      where: {
+        id: userId,
+      },
+    }
+  );
+  res.clearCookie("refreshtoken");
+  return res.sendStatus(200);
+};
