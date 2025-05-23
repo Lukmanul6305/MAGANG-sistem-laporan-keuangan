@@ -15,12 +15,12 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+
 exports.Registrasi = async (req, res) => {
   const { username, email, password, confPassword } = req.body;
   const created_at = new Date();
-  if (password !== confPassword) {
-    return res.status(400).json({ msg: "password tidak cocok" });
-  }
+  if(email === `${email}@gmail.com`) return res.status(400).json({ msg: "format email tidak cocok" });
+  if (password !== confPassword || confPassword !== password) return res.status(400).json({ msg: "password tidak cocok" });
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
   try {
@@ -66,8 +66,12 @@ exports.login = async (req, res) => {
     res.cookie("refreshtoken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
+      secure: false, // Wajib false kalau belum pakai HTTPS (localhost)
+      sameSite: "Lax", // atau "None" kalau beda origin
     });
     res.json({ accessToken });
+    console.log("Isi cookie:", req.cookies);
+
   } catch (err) {
     res.status(404).json({ msg: "email tidak ditemukan" });
     // console.log(err);
