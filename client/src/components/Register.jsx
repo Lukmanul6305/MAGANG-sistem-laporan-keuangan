@@ -54,21 +54,21 @@ const Register = () => {
               {msg && <p className="text-red-500 text-sm">{msg}</p>}
             </div>
             <form onSubmit={Registrasi} className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 items-center">
                 <label className="font-bold pr-70">username :</label>
                 <input
                   type="text"
-                  className="shadow appearance-none rounded-2xl bg-amber-50 focus:bg-amber-100   py-2 px-4 text-black leading-tight focus:outline-none focus:shadow-outline mx-37.5"
+                  className="shadow appearance-none rounded-2xl bg-amber-50 focus:bg-amber-100   py-2 px-4 text-black leading-tight focus:outline-none focus:shadow-outline w-90"
                   placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 items-center">
                 <label className="font-bold pr-77">email :</label>
                 <input
                   type="text"
-                  className="shadow appearance-none rounded-2xl bg-amber-50 focus:bg-amber-100   py-2 px-4 text-black leading-tight focus:outline-none focus:shadow-outline mx-37.5"
+                  className="shadow appearance-none rounded-2xl bg-amber-50 focus:bg-amber-100   py-2 px-4 text-black leading-tight focus:outline-none focus:shadow-outline w-90"
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

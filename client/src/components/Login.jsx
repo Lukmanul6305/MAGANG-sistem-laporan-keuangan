@@ -53,21 +53,21 @@ const Login = () => {
               {msg && <p className="text-red-500 text-sm">{msg}</p>}
             </div>
             <form onSubmit={Auth} className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 items-center">
                 <label className="font-bold pr-50">Email atau Username :</label>
                 <input
                   type="text"
-                  className="shadow appearance-none rounded-2xl bg-amber-50 focus:bg-amber-100   py-2 px-4 text-black leading-tight focus:outline-none focus:shadow-outline mx-37.5"
+                  className="shadow appearance-none rounded-2xl bg-amber-50 focus:bg-amber-100 py-2 px-4 text-black leading-tight focus:outline-none focus:shadow-outline w-90"
                   placeholder="Email or Username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 items-center">
                 <label className="font-bold pr-70">Password :</label>
                 <input
                   type="password"
-                  className="shadow appearance-none rounded-2xl bg-amber-50 focus:bg-amber-100 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mx-37.5"
+                  className="shadow appearance-none rounded-2xl bg-amber-50 focus:bg-amber-100 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline  w-90"
                   placeholder="******"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
