@@ -1,14 +1,14 @@
-const Pemasukan = ({ isOpen }) => {
+const Pengeluaran = ({ isOpen }) => {
   return (
     <div className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${isOpen ? "lg:ml-70" : "lg:ml-20"} max-w-full  `}>
       <header className="flex w-full h-20 justify-between">
         <div className="flex flex-col justify-end">
-          <h1 className="text-red-700 font-bold text-4xl">Buat Pemasukan</h1>
+          <h1 className="text-red-700 font-bold text-4xl">Buat Pengeluaran</h1>
           <p className="text-xs">Buat laporan mudah cepat dan aman</p>
         </div>
       </header>
         <h1 className="font-bold text-2xl flex w-full h-15 justify-center items-center">
-            Pemasukan Laporan Keuangan
+            Pengeluaran Laporan Keuangan
         </h1>
         <form className="flex flex-col gap-1">
             <div className="flex flex-col">
@@ -39,4 +39,4 @@ const Pemasukan = ({ isOpen }) => {
   );
 };
 
-export default Pemasukan;
+export default Pengeluaran;

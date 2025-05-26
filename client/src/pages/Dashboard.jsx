@@ -26,17 +26,21 @@ const Dashboard = ({isOpen}) => {
   };
 
   return (
+    <div>
+
     <div className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${
         isOpen ? "lg:ml-70" : "lg:ml-20"
-      } w-screen`}>
-      <header className="flex w-full h-40 justify-between">
-        <div className="flex flex-col items-start justify-center">
+      }`}>
+      <header className="flex flex-col w-full h-40 justify-between">
+        <div className="flex flex-col items-start justify-center h-full">
           <h1 className="text-red-700 font-bold text-5xl">Dashboard</h1>
           <p className="text-xs" >ini tanggal</p>
         </div>
-          <button onClick={(e)=> alert("kepencet")} className="h-10"><img src="https://images.icon-icons.com/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png" className="w-10" alt="" /></button>
+        <div>
+          <h1 className="font-bold text-2xl">Hallo Lukmanul hakim</h1>
+        </div>
       </header>
-      <div className="grid grid-cols-2 grid-rows-[150px_1fr] gap-4 h-full">
+      <div className="grid grid-cols-2 grid-rows-[150px_1fr] gap-4 h-full mt-20">
         <div className="bg-white rounded-xl shadow p-4 flex  items-center">
           <div className="text-center w-full">
             <h2 className="font-bold text-xl">Pemasukan</h2>
@@ -80,6 +84,19 @@ const Dashboard = ({isOpen}) => {
   </div>
         
       </div>
+    </div>
+      <footer className="mt-50  h-80 bg-gray-50">
+        <div className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${isOpen ? "lg:ml-70" : "lg:ml-20"}`}>
+          <div className="w-full flex flex-col items-center">
+          <div>
+            SILAKU <span>nomer hp</span> <span>alamat</span> <span>icon</span>
+          </div>
+          <div>
+            hubungi kami <span>gmail</span>
+          </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
