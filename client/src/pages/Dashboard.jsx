@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
 
-const Dashboard = () => {
+const Dashboard = ({isOpen}) => {
   const [name, setName] = useState("");
   const [token, setToken] = useState("");
 
@@ -26,15 +26,17 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col w-full p-5">
-      <header className="flex w-full h-50 justify-between mb-20">
+    <div className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${
+        isOpen ? "lg:ml-70" : "lg:ml-20"
+      } w-screen`}>
+      <header className="flex w-full h-40 justify-between">
         <div className="flex flex-col items-start justify-center">
           <h1 className="text-red-700 font-bold text-5xl">Dashboard</h1>
           <p className="text-xs" >ini tanggal</p>
         </div>
           <button onClick={(e)=> alert("kepencet")} className="h-10"><img src="https://images.icon-icons.com/2468/PNG/512/user_kids_avatar_user_profile_icon_149314.png" className="w-10" alt="" /></button>
       </header>
-      <div className="grid grid-cols-2 grid-rows-[150px_1fr] gap-4 h-full gap-2">
+      <div className="grid grid-cols-2 grid-rows-[150px_1fr] gap-4 h-full">
         <div className="bg-white rounded-xl shadow p-4 flex  items-center">
           <div className="text-center w-full">
             <h2 className="font-bold text-xl">Pemasukan</h2>
