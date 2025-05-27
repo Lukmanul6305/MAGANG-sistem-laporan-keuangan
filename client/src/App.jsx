@@ -5,21 +5,22 @@ import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Pemasukan from "./pages/Pemasukan";
-import Layout from "./components/Layout"
+import Layout from "./components/Layout";
 import Pengeluaran from "./pages/Pengeluaran";
-import DaftarTransaksi from "./pages/DaftarTransaksi"
+import DaftarTransaksi from "./pages/DaftarTransaksi";
 import Laporan from "./pages/Laporan";
-import Profil from "./components/profil";
+import Profil from "./components/Profil";
+import ProfilPage from "./pages/ProfilPages";
 
 function App() {
-      const [isOpen,setIsOpen] = useState(true)
-      const [animate,setAnimate] = useState(false)
-  
-      const handleToggle = () =>{
-          setAnimate(true)
-          setIsOpen(!isOpen)
-          setTimeout(()=> setAnimate(false),300)
-      }
+  const [isOpen, setIsOpen] = useState(true);
+  const [animate, setAnimate] = useState(false);
+
+  const handleToggle = () => {
+    setAnimate(true);
+    setIsOpen(!isOpen);
+    setTimeout(() => setAnimate(false), 300);
+  };
   return (
     <BrowserRouter>
       <Routes>
@@ -29,13 +30,9 @@ function App() {
           path="/dashboard"
           element={
             <>
-              <Navbar
-              isOpen={isOpen}
-              animate={animate}
-              handleToggle={handleToggle}
-              />
-              <Dashboard isOpen={isOpen}/>
-              <Profil/>
+              <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
+              <Dashboard isOpen={isOpen} />
+              <Profil />
             </>
           }
         />
@@ -43,13 +40,9 @@ function App() {
           path="/Pemasukan"
           element={
             <>
-              <Navbar
-              isOpen={isOpen}
-              animate={animate}
-              handleToggle={handleToggle}
-              />
-              <Pemasukan isOpen={isOpen}/>
-              <Profil/>
+              <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
+              <Pemasukan isOpen={isOpen} />
+              <Profil />
             </>
           }
         />
@@ -57,13 +50,9 @@ function App() {
           path="/Pengeluaran"
           element={
             <>
-              <Navbar
-              isOpen={isOpen}
-              animate={animate}
-              handleToggle={handleToggle}
-              />
-              <Pengeluaran isOpen={isOpen}/>
-              <Profil/>
+              <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
+              <Pengeluaran isOpen={isOpen} />
+              <Profil />
             </>
           }
         />
@@ -71,13 +60,9 @@ function App() {
           path="/daftarTransaksi"
           element={
             <>
-              <Navbar
-              isOpen={isOpen}
-              animate={animate}
-              handleToggle={handleToggle}
-              />
-              <DaftarTransaksi isOpen={isOpen}/>
-              <Profil/>
+              <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
+              <DaftarTransaksi isOpen={isOpen} />
+              <Profil />
             </>
           }
         />
@@ -85,13 +70,18 @@ function App() {
           path="/laporan"
           element={
             <>
-              <Navbar
-              isOpen={isOpen}
-              animate={animate}
-              handleToggle={handleToggle}
-              />
-              <Laporan isOpen={isOpen}/>
+              <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
+              <Laporan isOpen={isOpen} />
               <Profil/>
+            </>
+          }
+        />
+        <Route
+          path="/profil"
+          element={
+            <>
+              <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
+              <ProfilPage isOpen={isOpen} />
             </>
           }
         />

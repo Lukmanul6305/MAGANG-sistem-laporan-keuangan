@@ -49,7 +49,7 @@ const daftarTransaksi = ({ isOpen }) => {
                     </tbody>
                 </table>
             </div>
-            <div className="p-5">
+            <div className="p-5 text-xs">
             <button className="w-full flex justify-end" >1 2 3 4 5 6 ...</button>
             <div className="w-full flex justify-end gap-5">
                 <button>Prev</button>

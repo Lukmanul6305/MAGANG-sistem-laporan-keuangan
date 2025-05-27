@@ -20,15 +20,15 @@ const Laporan = ({ isOpen }) => {
                 <button className="border rounded-sm w-20 h-8 items-center text-xs">Generate</button>
             </div>
             <div className="w-full flex justify-center p-4">
-                <div className="flex justify-center gap-4 h-30 w-1/2">
+                <div className="flex justify-center gap-4 h-30 w-[90%]">
                     <div className="border border-white shadow-sm rounded-lg flex flex-col font-bold text-blue-500 text-xs w-full items-center justify-center gap-1">
-                        <span className="text-2xl">Rp.uang</span>Total Saldo
+                        <span className="text-2xl p-2">Rp.uanggggggggggggggggg</span>Total Saldo
                     </div>
                     <div className="border border-white shadow-sm rounded-lg flex flex-col font-bold text-blue-500 text-xs w-full items-center justify-center gap-1">
-                        <span className="text-2xl">Rp.uang</span>Total Pemasukan
+                        <span className="text-2xl p-2">Rp.uang</span>Total Pemasukan
                     </div>
                     <div className="border border-white shadow-sm rounded-lg flex flex-col font-bold text-blue-500 text-xs w-full items-center justify-center gap-1">
-                        <span className="text-2xl">Rp.uang</span>Total Pengeluaran
+                        <span className="text-2xl p-2">Rp.uang</span>Total Pengeluaran
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@ const Laporan = ({ isOpen }) => {
                 </table>
             </div>
             <div className="w-full flex justify-end items-end h-20">
-                <button className="bg-blue-600 p-2 w-30 rounded-2xl text-white font-bold cursor-pointer">Buat</button>
+                <button className="bg-blue-600 p-2 w-30 rounded-2xl text-white font-bold cursor-pointer">Export</button>
             </div>
         </form>
     </div>
