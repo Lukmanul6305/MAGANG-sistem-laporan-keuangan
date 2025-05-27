@@ -10,10 +10,13 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  function handleClick(e){
+    e.preventDefault()
+    navigate('/register')
+  }
+
   const Auth = async (e) => {
     e.preventDefault();
-
-    console.log(email,password)
 
     try {
       await axios.post("http://localhost:5000/api/login", {
@@ -95,7 +98,7 @@ const Login = () => {
                   atau
                   <hr className="border-t-2 border-gray-300 my-4 w-37" />
                 </div>
-                <div className="mb-4">
+                <div className="mb-4" onClick={(e)=>handleClick(e)}>
                   <button className="w-90 rounded-2xl bg-blue-700 hover:bg-blue-900 cursor-pointer text-white font-bold py-2 px-4">Registrasi</button>
                 </div>
                 <div className="flex justify-center">

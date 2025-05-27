@@ -19,7 +19,9 @@ exports.getUsers = async (req, res) => {
 exports.Registrasi = async (req, res) => {
   const { username, email, password, confPassword } = req.body;
   const created_at = new Date();
-  if(email === `${email}@gmail.com`) return res.status(400).json({ msg: "format email tidak cocok" });
+  if(!username || !email || !password || !confPassword) return res.status(400).json({ msg: "Data Belum diisi" });
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return res.status(400).json({ msg: "Format email tidak cocok" });
   if (password !== confPassword || confPassword !== password) return res.status(400).json({ msg: "password tidak cocok" });
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
@@ -30,9 +32,9 @@ exports.Registrasi = async (req, res) => {
       isSuccess: result.affectedRows,
       id: result.insertId,
     };
-    response(200, data, "Registrasi Berhasil", res);
+    res.status(200).json({msg : "berhasil membuat user"})
   } catch (err) {
-    response(500, null, err.message, res);
+    res.status(500).json({msg : "gagal membuat user"})
   }
 };
 
@@ -74,8 +76,6 @@ exports.login = async (req, res) => {
 
   } catch (err) {
     res.status(404).json({ msg: "email tidak ditemukan" });
-    // console.log(err);
-    // response(400, err, "email tidak ditemukan", res);
   }
 };
 

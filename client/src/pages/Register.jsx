@@ -11,21 +11,27 @@ const Register = () => {
 
   const navigate = useNavigate();
 
+  function handleClick(e){
+    e.preventDefault();
+    navigate('/')
+  }
   const Registrasi = async (e) => {
     e.preventDefault();
-
+    
     try {
       await axios.post("http://localhost:5000/api/registrasi", {
-        username,
-        email,
-        password,
-        confPassword,
+        username : username,
+        email : email,
+        password : password,
+        confPassword : confPassword,
       });
+      alert("membuat user Berhasil")
       navigate("/");
     } catch (err) {
-      if (err.response) {
-        setMsg(err.response.data.msg);
-      }
+        if(err.response){
+          setMsg(err.response.data.msg);
+          setMsg("Terjadi kesalahan saat registrasi.");
+        }
     }
   };
 
@@ -51,9 +57,9 @@ const Register = () => {
             <div className="pt-8 flex flex-col gap-2">
               <header className="text-5xl font-bold">Registrasi</header>
               <p>Selamat datang diwebsite sistem laporan keuangan</p>
-              {msg && <p className="text-red-500 text-sm">{msg}</p>}
             </div>
             <form onSubmit={Registrasi} className="flex flex-col gap-2">
+              {msg && <p className="text-red-500 text-sm">{msg}</p>}
               <div className="flex flex-col gap-2 items-center">
                 <label className="font-bold pr-70">username :</label>
                 <input
@@ -100,9 +106,9 @@ const Register = () => {
                     Saya Setuju
                   </label>
                 </div>
-                <a href="#" className="text-sm underline text-blue-800">
+                <button onClick={(e)=>handleClick(e)} className="text-sm underline text-blue-800 cursor-pointer">
                   Sudah Punya akun?
-                </a>
+                </button>
               </div>
                   <button className="w-90 rounded-2xl bg-blue-700 hover:bg-blue-900 cursor-pointer text-white font-bold py-2 px-4" type="submit">
                     Registrasi
