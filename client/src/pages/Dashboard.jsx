@@ -13,13 +13,13 @@ const Dashboard = ({isOpen}) => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/users", {
+      const response = await axios.get("http://localhost:5000/api/token", {
         withCredentials: true,
       });
       setToken(response.data.accessToken);
       const decoded = jwtDecode(response.data.accessToken);
       setName(decoded.name);
-      console.log(decoded);
+      consle(decoded);
     } catch (err) {
       console.log(err);
     }

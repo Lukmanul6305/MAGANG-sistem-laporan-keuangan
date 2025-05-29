@@ -12,6 +12,9 @@ import Laporan from "./pages/Laporan";
 import Profil from "./components/Profil";
 import ProfilPage from "./pages/ProfilPages";
 
+import NavbarAdmin from './components/NavbarAdmin'
+import DashboardAdmin from './pages/admin/DashboardAdmin'
+
 function App() {
   const [isOpen, setIsOpen] = useState(true);
   const [animate, setAnimate] = useState(false);
@@ -26,6 +29,16 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/Admin" element={
+          <>
+            <NavbarAdmin
+            isOpen={isOpen}
+            animate={animate}
+            handleToggle={handleToggle}
+            />
+            <DashboardAdmin isOpen={isOpen}/>
+          </>
+        } />
         <Route
           path="/dashboard"
           element={
