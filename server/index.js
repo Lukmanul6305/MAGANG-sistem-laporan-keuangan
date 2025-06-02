@@ -8,8 +8,8 @@ dotenv.config();
 const app = express();
 const port = 5000;
 
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(cookieParser());
+app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(express.json());
 
 const routes = [

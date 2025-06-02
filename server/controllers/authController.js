@@ -15,11 +15,10 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-
 exports.Registrasi = async (req, res) => {
   const { username, email, password, confPassword } = req.body;
   const created_at = new Date();
-  if(!username || !email || !password || !confPassword) return res.status(400).json({ msg: "Data Belum diisi" });
+  if (!username || !email || !password || !confPassword) return res.status(400).json({ msg: "Data Belum diisi" });
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) return res.status(400).json({ msg: "Format email tidak cocok" });
   if (password !== confPassword || confPassword !== password) return res.status(400).json({ msg: "password tidak cocok" });
@@ -32,9 +31,9 @@ exports.Registrasi = async (req, res) => {
       isSuccess: result.affectedRows,
       id: result.insertId,
     };
-    res.status(200).json({msg : "berhasil membuat user"})
+    res.status(200).json({ msg: "berhasil membuat user" });
   } catch (err) {
-    res.status(500).json({msg : "gagal membuat user"})
+    res.status(500).json({ msg: "gagal membuat user" });
   }
 };
 
@@ -73,7 +72,6 @@ exports.login = async (req, res) => {
     });
     res.json({ accessToken });
     console.log("Isi cookie:", req.cookies);
-
   } catch (err) {
     res.status(404).json({ msg: "email tidak ditemukan" });
   }

@@ -1,6 +1,66 @@
 const db = require("../../database/connection")
 const response = require("../utils/response")
 
+
+exports.getTransaksiSaldo = async (req, res) => {
+    try {
+        const [result] = await db.query(
+            // `SELECT SUM(jumlah) AS total_saldo FROM tb_transaksi WHERE tipe = 'Pemasukan'`
+            `
+            SELECT
+                SUM(CASE WHEN tipe = 'Pemasukan' THEN jumlah ELSE 0 END) AS total_pemasukan,
+                SUM(CASE WHEN tipe = 'Pengeluaran' THEN jumlah ELSE 0 END) AS total_pengeluaran,
+                SUM(CASE WHEN tipe = 'Pemasukan' THEN jumlah ELSE 0 END) -
+                SUM(CASE WHEN tipe = 'Pengeluaran' THEN jumlah ELSE 0 END) AS total_saldo
+            FROM tb_transaksi
+            `
+        );
+        res.json(result[0]); // karena hasilnya cuma 1 baris, langsung ambil [0]
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+exports.getTransaksiExpens = async (req, res) => {
+    try {
+        const [result] = await db.query(
+            `SELECT SUM(jumlah) AS total_pengeluaran FROM tb_transaksi WHERE tipe = 'Pengeluaran'`
+        );
+        res.json(result[0]); // karena hasilnya cuma 1 baris, langsung ambil [0]
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+exports.getTransaksiIncomes = async (req, res) => {
+    try {
+        const [result] = await db.query(
+            `SELECT SUM(jumlah) AS total_pemasukan  FROM tb_transaksi  WHERE tipe = 'Pemasukan'`
+        );
+        res.json(result[0]); // karena hasilnya cuma 1 baris, langsung ambil [0]
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+exports.getTransaksiBulanan = async (req, res) => {
+  try {
+    const [result] = await db.query(`
+      SELECT 
+        DATE_FORMAT(tanggal, '%Y-%m') AS bulan,
+        SUM(CASE WHEN tipe = 'Pemasukan' THEN jumlah ELSE 0 END) AS total_pemasukan,
+        SUM(CASE WHEN tipe = 'Pengeluaran' THEN jumlah ELSE 0 END) AS total_pengeluaran
+      FROM tb_transaksi
+      GROUP BY DATE_FORMAT(tanggal, '%Y-%m')
+      ORDER BY bulan
+    `);
+
+    res.json(result); // kirim array data bulanan
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+
 exports.postTransaksi = async (req,res)=>{
     try{
         const {user_id,kategori_id,tipe,jumlah,deskripsi,tanggal} = req.body
@@ -43,3 +103,5 @@ exports.deleteTransaksi = async (req,res)=>{
 
     }
 }
+
+

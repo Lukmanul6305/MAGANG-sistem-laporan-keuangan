@@ -80,7 +80,6 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
                 <button onClick={handleClickPengeluaran} className=" lg:p-3 hover:bg-blue-700 rounded-br-lg">
                   <img src="https://images.icon-icons.com/550/PNG/512/business-color_money-coins_icon-icons.com_53446.png" className="w-10" />
                 </button>
-                <button></button>
               </div>
             )}
           </div>
