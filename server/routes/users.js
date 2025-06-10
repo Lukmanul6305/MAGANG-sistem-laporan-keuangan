@@ -8,8 +8,8 @@ const { refreshToken } = require("../controllers/refreshToken");
 const { verifyToken } = require("../middlewares/VerifyToken");
 const validateUser = require("../middlewares/validateUser");
 
-router.get("/users", verifyToken, getUsers);
-router.get("/token", refreshToken);
+router.get("/users", getUsers); //verifyToken
+// router.get("/token", refreshToken);
 
 router.post("/registrasi", validateUser, Registrasi);
 router.post("/login", login);

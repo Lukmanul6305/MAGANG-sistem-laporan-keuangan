@@ -11,9 +11,10 @@ import DaftarTransaksi from "./pages/DaftarTransaksi";
 import Laporan from "./pages/Laporan";
 import Profil from "./components/Profil";
 import ProfilPage from "./pages/ProfilPages";
+import HomePage from "./pages/HomePage";
 
-import NavbarAdmin from './components/NavbarAdmin'
-import DashboardAdmin from './pages/admin/DashboardAdmin'
+import NavbarAdmin from "./components/NavbarAdmin";
+import DashboardAdmin from "./pages/admin/DashboardAdmin";
 
 function App() {
   const [isOpen, setIsOpen] = useState(true);
@@ -27,18 +28,18 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/Admin" element={
-          <>
-            <NavbarAdmin
-            isOpen={isOpen}
-            animate={animate}
-            handleToggle={handleToggle}
-            />
-            <DashboardAdmin isOpen={isOpen}/>
-          </>
-        } />
+        <Route
+          path="/Admin"
+          element={
+            <>
+              <NavbarAdmin isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
+              <DashboardAdmin isOpen={isOpen} />
+            </>
+          }
+        />
         <Route
           path="/dashboard"
           element={
@@ -85,7 +86,7 @@ function App() {
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
               <Laporan isOpen={isOpen} />
-              <Profil/>
+              <Profil />
             </>
           }
         />

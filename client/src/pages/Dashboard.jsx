@@ -1,36 +1,24 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+// axios tidak lagi digunakan, bisa dihapus jika tidak ada penggunaan lain yang relevan
+// import axios from "axios";
+// Hapus import jwtDecode karena tidak lagi menggunakan JWT
+// import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom"; // Import useNavigate untuk redirect
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { useNavigate } from "react-router-dom";
 
-const Dashboard = ({ isOpen }) => {
-  const [name, setName] = useState("");
+// Komponen Dashboard sekarang menerima prop 'userId' dari App.jsx
+const Dashboard = ({ isOpen, userId }) => {
+  const [name, setName] = useState("Pengguna"); // Default nama jika belum ada
   const [saldo, setSaldo] = useState(0);
   const [expenses, setExpenses] = useState(0);
   const [incomes, setIncomes] = useState(0);
   const [loading, setLoading] = useState(true);
   const [bulanan, setBulanan] = useState([]);
-  const [token, setToken] = useState("");
   const [dateTime, setDateTime] = useState(new Date());
 
-  const refreshToken = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/token", {
-        withCredentials: true,
-      });
-      setToken(response.data.accessToken);
-      const decoded = jwtDecode(response.data.accessToken);
-      setName(decoded.name);
-    } catch (err) {
-      console.error("Gagal refresh token:", err);
-    }
-  };
+  const navigate = useNavigate(); // Inisialisasi useNavigate
 
-  useEffect(() => {
-    refreshToken();
-  }, []);
-
+  // Efek untuk memperbarui waktu secara real-time
   useEffect(() => {
     const timer = setInterval(() => {
       setDateTime(new Date());
@@ -38,29 +26,55 @@ const Dashboard = ({ isOpen }) => {
     return () => clearInterval(timer);
   }, []);
 
+  // Efek untuk mengambil nama pengguna dari localStorage dan melakukan redirect jika userId tidak ada
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('loggedInUsername');
+    if (storedUsername) {
+      setName(storedUsername);
+    }
+
+    // Redirect ke halaman login jika userId tidak ada (tidak terautentikasi)
+    if (!userId) {
+      console.warn("User ID tidak tersedia. Mengarahkan ke halaman login.");
+      navigate('/login'); // Arahkan ke halaman login
+      return; // Hentikan eksekusi lebih lanjut
+    }
+  }, [userId, navigate]); // Tambahkan userId dan navigate sebagai dependensi
+
+  // Efek untuk mengambil data transaksi dari backend berdasarkan userId
   useEffect(() => {
     const fetchData = async () => {
+      // Tidak perlu lagi memeriksa userId di sini karena sudah ditangani di useEffect sebelumnya
+      // Jika useEffect sebelumnya sudah mengarahkan, kode ini tidak akan dijalankan
+
       try {
         const [saldoRes, incomeRes, expenseRes, bulananRes] = await Promise.all([
-          fetch("http://localhost:5000/api/transaksi/saldo").then((res) => res.json()),
-          fetch("http://localhost:5000/api/transaksi/incomes").then((res) => res.json()),
-          fetch("http://localhost:5000/api/transaksi/expens").then((res) => res.json()),
-          fetch("http://localhost:5000/api/transaksi/bulanan").then((res) => res.json()),
+          // Mengirim userId sebagai query parameter ke backend untuk setiap API
+          fetch(`http://localhost:5000/api/transaksi/saldo?user_id=${userId}`).then((res) => res.json()),
+          fetch(`http://localhost:5000/api/transaksi/incomes?user_id=${userId}`).then((res) => res.json()),
+          fetch(`http://localhost:5000/api/transaksi/expens?user_id=${userId}`).then((res) => res.json()),
+          fetch(`http://localhost:5000/api/transaksi/bulanan?user_id=${userId}`).then((res) => res.json()),
         ]);
+
         setSaldo(saldoRes.total_saldo || 0);
         setIncomes(incomeRes.total_pemasukan || 0);
         setExpenses(expenseRes.total_pengeluaran || 0);
         setBulanan(bulananRes || []);
       } catch (err) {
         console.error("Gagal fetch data transaksi:", err);
+        // Anda bisa menambahkan UI untuk menampilkan pesan error kepada pengguna di sini
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    // Panggil fetchData hanya jika userId sudah tersedia
+    if (userId) {
+      fetchData();
+    }
+  }, [userId]); // Dependensi 'userId' akan memicu efek ini setiap kali userId berubah
 
+  // Memformat data bulanan untuk grafik
   const data = bulanan.map((item) => {
     const bulanFormat = new Date(item.bulan + "-01").toLocaleString("id-ID", {
       month: "short",
@@ -72,7 +86,12 @@ const Dashboard = ({ isOpen }) => {
     };
   });
 
-  if (loading) return <p className="p-10">Loading...</p>;
+  // Tampilkan loading state hanya jika userId tersedia dan data masih dimuat
+  if (loading && userId) return <p className="p-10">Memuat...</p>;
+
+  // Jika tidak loading dan userId tidak ada (sudah dialihkan), atau jika data sudah dimuat
+  // Tidak perlu render apa pun jika akan segera dialihkan (userId null)
+  if (!userId) return null; // Atau tampilkan loading/pesan singkat sebelum redirect
 
   return (
     <div>
@@ -90,6 +109,7 @@ const Dashboard = ({ isOpen }) => {
         </header>
 
         <div className="grid grid-cols-2 grid-rows-[150px_1fr] gap-4 h-full mt-10">
+          {/* Kartu Pemasukan dan Pengeluaran */}
           <div className="bg-white rounded-xl shadow p-4 flex items-center">
             <div className="text-center w-full text-blue-600">
               <h2 className="font-bold text-xl">Pemasukan</h2>
@@ -103,6 +123,7 @@ const Dashboard = ({ isOpen }) => {
             </div>
           </div>
 
+          {/* Kartu Saldo Akhir */}
           <div className="bg-white rounded-xl shadow p-10 flex justify-between items-center">
             <div>
               <h2 className="font-bold text-xl">Saldo Akhir</h2>
@@ -112,6 +133,7 @@ const Dashboard = ({ isOpen }) => {
             <img src="https://images.icon-icons.com/943/PNG/512/shoppaymentorderbuy-04_icon-icons.com_73886.png" alt="wallet" className="w-16 h-16" />
           </div>
 
+          {/* Grafik Bulanan Pemasukan & Pengeluaran */}
           <div className="bg-white rounded-xl shadow p-10 h-[80vh] flex flex-col">
             <h2 className="text-center font-bold text-2xl">Grafik Bulanan</h2>
             <div className="text-center text-blue-700 font-bold mt-2">Pemasukan</div>
@@ -140,6 +162,7 @@ const Dashboard = ({ isOpen }) => {
             </div>
           </div>
 
+          {/* Pie Chart Pemasukan vs Pengeluaran */}
           <div className="bg-white rounded-xl shadow p-10 flex flex-col items-center justify-center">
             <h2 className="text-center font-bold text-3xl">
               <span className="text-blue-700">Pemasukan</span> vs <span className="text-red-700">Pengeluaran</span>
