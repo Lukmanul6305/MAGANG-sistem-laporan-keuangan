@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
@@ -19,6 +19,14 @@ import DashboardAdmin from "./pages/admin/DashboardAdmin";
 function App() {
   const [isOpen, setIsOpen] = useState(true);
   const [animate, setAnimate] = useState(false);
+  const [userId, setUserId] = useState(localStorage.getItem('userId'));
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
 
   const handleToggle = () => {
     setAnimate(true);
@@ -45,7 +53,7 @@ function App() {
           element={
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <Dashboard isOpen={isOpen} />
+              <Dashboard isOpen={isOpen} userId={userId} />
               <Profil />
             </>
           }

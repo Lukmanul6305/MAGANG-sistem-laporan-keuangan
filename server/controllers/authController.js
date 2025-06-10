@@ -97,10 +97,16 @@ exports.login = async (req, res) => {
       return res.status(400).json({ msg: "Password salah" });
     }
 
-    // Since there are no tokens, a successful login just means
-    // the credentials are correct. You might redirect the user
-    // or return a simple success message.
-    res.status(200).json({ msg: "Login berhasil!" });
+    // Send user data (excluding password) on successful login
+    const userData = {
+      id: user.id,
+      username: user.username,
+      email: user.email
+    };
+    res.status(200).json({ 
+      msg: "Login berhasil!",
+      user: userData
+    });
   } catch (err) {
     console.error("Error during login:", err);
     // If the error isn't a 404 (user not found), it's an internal server error.

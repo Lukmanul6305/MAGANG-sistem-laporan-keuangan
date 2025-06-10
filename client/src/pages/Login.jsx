@@ -19,12 +19,20 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:5000/api/login", {
+      const response = await axios.post("http://localhost:5000/api/login", {
         email,
         password,
       },{
         withCredentials: true,
       });
+      
+      // Store user data in localStorage
+      if (response.data.user) {
+        localStorage.setItem('loggedInUser', JSON.stringify(response.data.user));
+        localStorage.setItem('loggedInUsername', response.data.user.username);
+        localStorage.setItem('userId', response.data.user.id);
+      }
+      
       navigate("/dashboard");
     } catch (err) {
       if (err.response) {
@@ -66,6 +74,7 @@ const Login = () => {
                   placeholder="Email or Username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="username"
                 />
               </div>
               <div className="flex flex-col gap-2 items-center">
@@ -76,6 +85,7 @@ const Login = () => {
                   placeholder="******"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                 />
               </div>
               <div className="flex justify-center gap-x-40">
