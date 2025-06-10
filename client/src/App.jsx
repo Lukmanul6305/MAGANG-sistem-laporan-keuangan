@@ -63,7 +63,7 @@ function App() {
           element={
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <Pemasukan isOpen={isOpen} />
+              <Pemasukan isOpen={isOpen} userId={userId} />
               <Profil />
             </>
           }
@@ -73,7 +73,7 @@ function App() {
           element={
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <Pengeluaran isOpen={isOpen} />
+              <Pengeluaran isOpen={isOpen} userId={userId} />
               <Profil />
             </>
           }

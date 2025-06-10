@@ -1,58 +1,108 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+// Tidak perlu mengimpor useAuth di sini karena userId akan diterima sebagai prop
 
-const Pengeluaran = ({ isOpen }) => {
+const Pengeluaran = ({ isOpen, userId }) => { // userId diterima sebagai prop
   const [formData, setFormData] = useState({
     tanggal: "",
-    tipe: "Pengeluaran",
+    tipe: "Pengeluaran", // Tipe transaksi sudah pasti "Pengeluaran"
     jumlah: "",
     nama_kategori: "",
     metode_pembayaran: "",
     deskripsi: "",
+    // user_id tidak perlu diinisialisasi di sini karena akan didapat dari prop
   });
+  const [message, setMessage] = useState(""); // State untuk pesan notifikasi
+  const [isSuccess, setIsSuccess] = useState(false); // State untuk tipe pesan (sukses/gagal)
+
+  // Fungsi untuk menampilkan pesan notifikasi
+  const showMessage = (msg, success) => {
+    setMessage(msg);
+    setIsSuccess(success);
+    // Sembunyikan pesan setelah beberapa detik
+    setTimeout(() => {
+      setMessage("");
+    }, 3000);
+  };
+
+  // Validasi awal userId dan jika userId berubah
+  useEffect(() => {
+    if (!userId) {
+      console.warn("User ID tidak tersedia di komponen Pengeluaran. Mengarahkan ke halaman login.");
+      showMessage("Anda belum login. Silakan login terlebih dahulu.", false);
+      // Anda mungkin ingin menambahkan redirect di sini jika tidak ditangani di App.jsx
+      // Contoh: navigate('/login');
+    }
+  }, [userId]); // Dependensi userId agar efek ini berjalan jika userId berubah
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validasi dasar, termasuk user_id dari prop
+    if (!formData.tanggal || !formData.jumlah || !formData.nama_kategori || !formData.metode_pembayaran || !userId) {
+      showMessage("Semua field wajib diisi (kecuali deskripsi) dan Anda harus login.", false);
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
+      const payload = {
+        ...formData,
+        user_id: userId, // Gunakan userId dari prop untuk dikirim ke backend
+      };
+
       const res = await fetch("http://localhost:5000/api/transaksi/IPengeluaran", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          // Hapus header Authorization dengan token lama
+          // Authorization: Bearer ${token},
         },
-        body: JSON.stringify(formData),
+        credentials: 'include', // PENTING: Untuk mengirim cookie sesi ke backend
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
 
       if (res.ok) {
-        alert("Pengeluaran berhasil disimpan!");
-        setFormData({
+        showMessage("Pengeluaran berhasil disimpan!", true); // Tampilkan pesan sukses
+        // Reset form, user_id tidak perlu direset karena dari prop
+        setFormData(prevFormData => ({
           tanggal: "",
           tipe: "Pengeluaran",
           jumlah: "",
           nama_kategori: "",
           metode_pembayaran: "",
           deskripsi: "",
-        });
+        }));
       } else {
-        alert(result.message || "Gagal menyimpan pengeluaran.");
+        showMessage(result.message || "Gagal menyimpan pengeluaran.", false); // Tampilkan pesan gagal dari backend
       }
     } catch (err) {
       console.error("Error:", err);
-      alert("Terjadi kesalahan saat mengirim data.");
+      showMessage("Terjadi kesalahan saat mengirim data.", false); // Tampilkan pesan error umum
     }
   };
 
   return (
-    <div className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${isOpen ? "lg:ml-70" : "lg:ml-20"} max-w-full`}>
+    <div
+      className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${
+        isOpen ? "lg:ml-70" : "lg:ml-20"
+      } max-w-full`}
+    >
       <header className="flex w-full h-20 justify-between">
         <div className="flex flex-col justify-end">
           <h1 className="text-red-700 font-bold text-4xl">Buat Pengeluaran</h1>
           <p className="text-xs">Buat laporan mudah cepat dan aman</p>
         </div>
       </header>
+
+      {/* Area untuk menampilkan pesan notifikasi */}
+      {message && (
+        <div className={`p-3 my-4 rounded-lg text-white font-medium ${isSuccess ? "bg-green-500" : "bg-red-500"}`}>
+          {message}
+        </div>
+      )}
+      {/* Akhir area notifikasi */}
+
       <h1 className="font-bold text-2xl flex w-full h-15 justify-center items-center">
         Pengeluaran Laporan Keuangan
       </h1>
@@ -117,6 +167,16 @@ const Pengeluaran = ({ isOpen }) => {
             <option value="E-Wallet">E-Wallet</option>
             <option value="QRIS">QRIS</option>
           </select>
+        </div>
+        <div className="flex flex-col">
+          <label className="p-1 text-lg">Deskripsi</label>
+          <input
+            type="text"
+            placeholder="Tambahkan deskripsi (opsional)"
+            value={formData.deskripsi}
+            onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
+          />
         </div>
         <div className="w-full flex justify-end items-end h-20">
           <button type="submit" className="bg-blue-600 p-2 w-30 rounded-2xl text-white font-bold cursor-pointer">

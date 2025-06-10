@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
-// axios tidak lagi digunakan, bisa dihapus jika tidak ada penggunaan lain yang relevan
-// import axios from "axios";
-// Hapus import jwtDecode karena tidak lagi menggunakan JWT
-// import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom"; // Import useNavigate untuk redirect
+import { useNavigate } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
-// Komponen Dashboard sekarang menerima prop 'userId' dari App.jsx
 const Dashboard = ({ isOpen, userId }) => {
-  const [name, setName] = useState("Pengguna"); // Default nama jika belum ada
+  const [name, setName] = useState("Pengguna"); 
   const [saldo, setSaldo] = useState(0);
   const [expenses, setExpenses] = useState(0);
   const [incomes, setIncomes] = useState(0);
@@ -16,9 +11,8 @@ const Dashboard = ({ isOpen, userId }) => {
   const [bulanan, setBulanan] = useState([]);
   const [dateTime, setDateTime] = useState(new Date());
 
-  const navigate = useNavigate(); // Inisialisasi useNavigate
+  const navigate = useNavigate(); 
 
-  // Efek untuk memperbarui waktu secara real-time
   useEffect(() => {
     const timer = setInterval(() => {
       setDateTime(new Date());
@@ -26,27 +20,21 @@ const Dashboard = ({ isOpen, userId }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Efek untuk mengambil nama pengguna dari localStorage dan melakukan redirect jika userId tidak ada
   useEffect(() => {
     const storedUsername = localStorage.getItem('loggedInUsername');
     if (storedUsername) {
       setName(storedUsername);
     }
 
-    // Redirect ke halaman login jika userId tidak ada (tidak terautentikasi)
     if (!userId) {
       console.warn("User ID tidak tersedia. Mengarahkan ke halaman login.");
-      navigate('/login'); // Arahkan ke halaman login
-      return; // Hentikan eksekusi lebih lanjut
+      navigate('/login');
+      return; 
     }
-  }, [userId, navigate]); // Tambahkan userId dan navigate sebagai dependensi
+  }, [userId, navigate]);
 
-  // Efek untuk mengambil data transaksi dari backend berdasarkan userId
   useEffect(() => {
     const fetchData = async () => {
-      // Tidak perlu lagi memeriksa userId di sini karena sudah ditangani di useEffect sebelumnya
-      // Jika useEffect sebelumnya sudah mengarahkan, kode ini tidak akan dijalankan
-
       try {
         const [saldoRes, incomeRes, expenseRes, bulananRes] = await Promise.all([
           // Mengirim userId sebagai query parameter ke backend untuk setiap API
@@ -62,19 +50,16 @@ const Dashboard = ({ isOpen, userId }) => {
         setBulanan(bulananRes || []);
       } catch (err) {
         console.error("Gagal fetch data transaksi:", err);
-        // Anda bisa menambahkan UI untuk menampilkan pesan error kepada pengguna di sini
       } finally {
         setLoading(false);
       }
     };
 
-    // Panggil fetchData hanya jika userId sudah tersedia
     if (userId) {
       fetchData();
     }
-  }, [userId]); // Dependensi 'userId' akan memicu efek ini setiap kali userId berubah
+  }, [userId]);
 
-  // Memformat data bulanan untuk grafik
   const data = bulanan.map((item) => {
     const bulanFormat = new Date(item.bulan + "-01").toLocaleString("id-ID", {
       month: "short",
@@ -86,11 +71,8 @@ const Dashboard = ({ isOpen, userId }) => {
     };
   });
 
-  // Tampilkan loading state hanya jika userId tersedia dan data masih dimuat
   if (loading && userId) return <p className="p-10">Memuat...</p>;
 
-  // Jika tidak loading dan userId tidak ada (sudah dialihkan), atau jika data sudah dimuat
-  // Tidak perlu render apa pun jika akan segera dialihkan (userId null)
   if (!userId) return null; // Atau tampilkan loading/pesan singkat sebelum redirect
 
   return (
