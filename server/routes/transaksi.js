@@ -13,6 +13,6 @@ router.post("/IPengeluaran",IPengeluaran);
 router.post("/" ,postTransaksi);
 
 router.put("/", putTransaksi);
-router.delete("/", deleteTransaksi);
+router.delete("/", deleteTransaksi)
 
 module.exports = router;

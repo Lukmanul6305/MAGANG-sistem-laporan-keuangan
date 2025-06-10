@@ -9,7 +9,7 @@ const Register = () => {
   const [confPassword, setConfPassword] = useState("");
   const [msg, setMsg] = useState("");
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   function handleClick(e){
     e.preventDefault();
