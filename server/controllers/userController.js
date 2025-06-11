@@ -1,8 +1,6 @@
 const db = require("../../database/connection");
-// const db = require("../../database/sequelize");
 const response = require("../utils/response");
 const bcrypt = require("bcrypt");
-const Users = require("../models/userModel");
 
 exports.getAllUsers = async (req, res) => {
   try {

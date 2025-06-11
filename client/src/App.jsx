@@ -19,10 +19,10 @@ import DashboardAdmin from "./pages/admin/DashboardAdmin";
 function App() {
   const [isOpen, setIsOpen] = useState(true);
   const [animate, setAnimate] = useState(false);
-  const [userId, setUserId] = useState(localStorage.getItem('userId'));
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem('userId');
+    const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
       setUserId(storedUserId);
     }
@@ -103,7 +103,7 @@ function App() {
           element={
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <ProfilPage isOpen={isOpen}  />
+              <ProfilPage isOpen={isOpen} />
             </>
           }
         />

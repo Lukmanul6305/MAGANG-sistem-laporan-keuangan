@@ -1,26 +1,35 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+// FIXED: Removed useLocation to prevent crash in preview environments.
+// Link is still needed for navigation.
+import { Link } from "react-router-dom";
 
+// Terima 'name' sebagai prop dari App.jsx
 const Navbar = ({ isOpen, handleToggle, animate }) => {
-  let name = "Lukmanul Hakim";
-  const [activeButton, setActiveButton] = useState("");
-  const navigate = useNavigate();
+  const [isBuatOpen, setIsBuatOpen] = useState(false);
+  // ADDED: State to hold the username
+  const [name, setName] = useState("Pengguna");
 
-  const handleClickPemasukan = (e) => {
-    e.preventDefault();
-    navigate("/Pemasukan");
-  };
-  const handleClickPengeluaran = (e) => {
-    e.preventDefault();
-    navigate("/Pengeluaran");
-  };
+  // ADDED: useEffect to get username from localStorage when the component mounts
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("loggedInUsername");
+    if (storedUsername) {
+      setName(storedUsername);
+    }
+  }, []);
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊", path: "/dashboard" },
     { id: "buat", label: "Buat laporan", icon: "✏️" },
-    { id: "transaksi", label: "Daftar Transaksi", icon: "📋",path :"/daftarTransaksi" },
-    { id: "keuangan", label: "Laporan Keuangan", icon: "📈",path:"/laporan" },
+    { id: "transaksi", label: "Daftar Transaksi", icon: "📋", path: "/daftarTransaksi" },
+    { id: "keuangan", label: "Laporan Keuangan", icon: "📈", path: "/laporan" },
   ];
+
+  // Fungsi untuk menutup dropdown "Buat Laporan" jika area lain diklik
+  const handleMenuClick = (item) => {
+    if (item.id !== "buat") {
+      setIsBuatOpen(false);
+    }
+  };
 
   return (
     <nav
@@ -47,46 +56,57 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
       <div className="flex flex-col gap-3 items-center w-full">
         {menuItems.map((item) => (
           <div key={item.id}>
-            <button
-              onClick={() => {
-                setActiveButton(activeButton === "buat" ? null : item.id);
-                navigate(item.path);
-              }}
-              className={`font-bold flex items-center p-2 rounded text-white cursor-pointer transition-all duration-200 hover:bg-blue-600
-              ${activeButton === item.id ? "bg-blue-800" : "bg-blue-500"}
-              ${isOpen ? "sm:w-70 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
-              `}
-            >
-              <span className="w-10 p-1">{item.icon}</span>
-              {isOpen && item.label}
-            </button>
-            {item.id === "buat" && activeButton === "buat" && isOpen && (
-              <div className="flex flex-col justify-between absolute lg:w-50 gap-3 p-3 bg-blue-400">
-                <button className="flex items-center bg-blue-700 font-bold text-white lg:p-3 rounded cursor-pointer" onClick={handleClickPemasukan}>
-                  <img src="https://images.icon-icons.com/2313/PNG/512/wallet_payment_purchase_coin_cash_money_icon_141978.png" className="w-10 p-2" />
-                  Pemasukan
-                </button>
-                <button className="flex items-center bg-blue-700 font-bold text-white lg:p-3 rounded cursor-pointer" onClick={handleClickPengeluaran}>
-                  <img src="https://images.icon-icons.com/550/PNG/512/business-color_money-coins_icon-icons.com_53446.png" className="w-10 p-2" />
-                  Pengeluaran
-                </button>
-              </div>
+            {item.path ? (
+              <Link
+                to={item.path}
+                onClick={() => handleMenuClick(item)}
+                // FIXED: Removed active link logic that depended on useLocation
+                className={`font-bold flex items-center p-2 rounded text-white cursor-pointer transition-all duration-200 bg-blue-500 hover:bg-blue-600
+                  ${isOpen ? "sm:w-70 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
+                `}
+              >
+                <span className="w-10 p-1">{item.icon}</span>
+                {isOpen && item.label}
+              </Link>
+            ) : (
+              // "Buat Laporan" tetap menggunakan <button> karena fungsinya beda
+              <button
+                onClick={() => setIsBuatOpen(!isBuatOpen)}
+                className={`font-bold flex items-center p-2 rounded text-white cursor-pointer transition-all duration-200 hover:bg-blue-600
+                  ${isBuatOpen ? "bg-blue-800" : "bg-blue-500"}
+                  ${isOpen ? "sm:w-70 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
+                `}
+              >
+                <span className="w-10 p-1">{item.icon}</span>
+                {isOpen && item.label}
+              </button>
             )}
-            {item.id === "buat" && activeButton === "buat" && !isOpen && (
-              <div className="flex flex-col fixed lg:left-20 lg:top-60 bg-blue-500 rounded-r-lg">
-                <button onClick={handleClickPemasukan} className=" lg:p-3 hover:bg-blue-700 rounded-tr-lg">
-                  <img src="https://images.icon-icons.com/2313/PNG/512/wallet_payment_purchase_coin_cash_money_icon_141978.png" className="w-10 " />
-                </button>
-                <button onClick={handleClickPengeluaran} className=" lg:p-3 hover:bg-blue-700 rounded-br-lg">
-                  <img src="https://images.icon-icons.com/550/PNG/512/business-color_money-coins_icon-icons.com_53446.png" className="w-10" />
-                </button>
+
+            {/* Logika dropdown "Buat Laporan" */}
+            {item.id === "buat" && isBuatOpen && (
+              <div
+                className={`flex flex-col gap-3 p-3 bg-blue-400
+                  ${isOpen ? "absolute lg:w-50" : "fixed lg:left-20 top-auto bg-blue-500 rounded-r-lg p-0"}`}
+              >
+                <Link to="/Pemasukan" onClick={() => setIsBuatOpen(false)} className={`flex items-center bg-blue-700 font-bold text-white rounded cursor-pointer hover:bg-blue-800 ${isOpen ? "lg:p-3" : "p-3 rounded-tr-lg rounded-br-none"}`}>
+                  <img src="https://images.icon-icons.com/2313/PNG/512/wallet_payment_purchase_coin_cash_money_icon_141978.png" className="w-10 p-2" alt="Pemasukan" />
+                  {isOpen && "Pemasukan"}
+                </Link>
+                <Link
+                  to="/Pengeluaran"
+                  onClick={() => setIsBuatOpen(false)}
+                  className={`flex items-center bg-blue-700 font-bold text-white rounded cursor-pointer hover:bg-blue-800 ${isOpen ? "lg:p-3" : "p-3 rounded-br-lg rounded-tr-none"}`}
+                >
+                  <img src="https://images.icon-icons.com/550/PNG/512/business-color_money-coins_icon-icons.com_53446.png" className="w-10 p-2" alt="Pengeluaran" />
+                  {isOpen && "Pengeluaran"}
+                </Link>
               </div>
             )}
           </div>
         ))}
       </div>
 
-      <footer className="text-white text-center text-sm pb-4 mt-auto">&copy; 2025 Lukmanul</footer>
+      <footer className="text-white text-center text-sm pb-4 mt-auto">&copy; 2025 {name}</footer>
     </nav>
   );
 };

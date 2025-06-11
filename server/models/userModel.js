@@ -13,13 +13,10 @@ const Users = db.define(
     password: {
       type: DataTypes.STRING,
     },
-    refresh_token: {
-      type: DataTypes.TEXT,
-    },
   },
   {
     freezeTableName: true,
-    timestamps: false
+    timestamps: false,
   }
 );
 

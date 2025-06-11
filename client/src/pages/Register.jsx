@@ -9,34 +9,34 @@ const Register = () => {
   const [confPassword, setConfPassword] = useState("");
   const [msg, setMsg] = useState("");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  function handleClick(e){
+  function handleClick(e) {
     e.preventDefault();
-    navigate('/')
+    navigate("/login");
   }
   const Registrasi = async (e) => {
     e.preventDefault();
-    
+
     try {
       await axios.post("http://localhost:5000/api/registrasi", {
-        username : username,
-        email : email,
-        password : password,
-        confPassword : confPassword,
+        username: username,
+        email: email,
+        password: password,
+        confPassword: confPassword,
       });
-      alert("membuat user Berhasil")
+      alert("membuat user Berhasil");
       navigate("/");
     } catch (err) {
-        if(err.response){
-          setMsg(err.response.data.msg);
-          setMsg("Terjadi kesalahan saat registrasi.");
-        }
+      if (err.response) {
+        setMsg(err.response.data.msg);
+        setMsg("Terjadi kesalahan saat registrasi.");
+      }
     }
   };
 
   return (
-      <>
+    <>
       <div className="flex items-center justify-center h-screen">
         <div className="flex flex-row-reverse text-center items-center justify-around h-[93%] w-[97%]">
           <div
@@ -99,20 +99,20 @@ const Register = () => {
                 />
               </div>
               <div className="flex flex-col items-center gap-2">
-              <div className="flex justify-center gap-x-36">
-                <div className="">
-                  <input type="checkbox" id="remember" className="mr-2 scale-150" />
-                  <label htmlFor="remember" className="text-sm">
-                    Saya Setuju
-                  </label>
-                </div>
-                <button onClick={(e)=>handleClick(e)} className="text-sm underline text-blue-800 cursor-pointer">
-                  Sudah Punya akun?
-                </button>
-              </div>
-                  <button className="w-90 rounded-2xl bg-blue-700 hover:bg-blue-900 cursor-pointer text-white font-bold py-2 px-4" type="submit">
-                    Registrasi
+                <div className="flex justify-center gap-x-36">
+                  <div className="">
+                    <input type="checkbox" id="remember" className="mr-2 scale-150" />
+                    <label htmlFor="remember" className="text-sm">
+                      Saya Setuju
+                    </label>
+                  </div>
+                  <button onClick={(e) => handleClick(e)} className="text-sm underline text-blue-800 cursor-pointer">
+                    Sudah Punya akun?
                   </button>
+                </div>
+                <button className="w-90 rounded-2xl bg-blue-700 hover:bg-blue-900 cursor-pointer text-white font-bold py-2 px-4" type="submit">
+                  Registrasi
+                </button>
               </div>
             </form>
           </div>

@@ -21,14 +21,14 @@ const Dashboard = ({ isOpen, userId }) => {
   }, []);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('loggedInUsername');
+    const storedUsername = localStorage.getItem("loggedInUsername");
     if (storedUsername) {
       setName(storedUsername);
     }
 
     if (!userId) {
       console.warn("User ID tidak tersedia. Mengarahkan ke halaman login.");
-      navigate('/login');
+      navigate("/login");
       return;
     }
   }, [userId, navigate]);
@@ -36,8 +36,6 @@ const Dashboard = ({ isOpen, userId }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Mengirim userId sebagai query parameter ke backend untuk setiap API
-        // Pastikan backend Anda merespons dengan struktur data yang sesuai
         const [saldoRes, incomeRes, expenseRes, bulananRes] = await Promise.all([
           fetch(`http://localhost:5000/api/transaksi/saldo?user_id=${userId}`).then((res) => res.json()),
           fetch(`http://localhost:5000/api/transaksi/incomes?user_id=${userId}`).then((res) => res.json()),
@@ -79,7 +77,7 @@ const Dashboard = ({ isOpen, userId }) => {
   ];
 
   // Warna untuk Pie Chart
-  const PIE_COLORS = ['#2563EB', '#DC2626']; // Biru untuk Pemasukan, Merah untuk Pengeluaran
+  const PIE_COLORS = ["#2563EB", "#DC2626"]; // Biru untuk Pemasukan, Merah untuk Pengeluaran
 
   if (loading && userId) return <p className="p-10">Memuat...</p>;
   if (!userId) return null; // Atau tampilkan loading/pesan singkat sebelum redirect
@@ -159,7 +157,9 @@ const Dashboard = ({ isOpen, userId }) => {
               <span className="text-blue-700">Pemasukan</span> vs <span className="text-red-700">Pengeluaran</span>
             </h2>
             {/* Kontainer dengan tinggi eksplisit untuk ResponsiveContainer */}
-            <div style={{ width: '100%', height: 250 }}> {/* Atur tinggi ini sesuai kebutuhan */}
+            <div style={{ width: "100%", height: 250 }}>
+              {" "}
+              {/* Atur tinggi ini sesuai kebutuhan */}
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -177,7 +177,7 @@ const Dashboard = ({ isOpen, userId }) => {
                       <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value, name) => [`Rp ${value.toLocaleString('id-ID')}`, name]} />
+                  <Tooltip formatter={(value, name) => [`Rp ${value.toLocaleString("id-ID")}`, name]} />
                   {/* Anda bisa menambahkan <Legend /> di sini jika ingin keterangan di bawah chart */}
                 </PieChart>
               </ResponsiveContainer>
