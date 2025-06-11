@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const Dashboard = ({ isOpen, userId }) => {
-  const [name, setName] = useState("Pengguna"); 
+  const [name, setName] = useState("Pengguna");
   const [saldo, setSaldo] = useState(0);
   const [expenses, setExpenses] = useState(0);
   const [incomes, setIncomes] = useState(0);
@@ -11,7 +11,7 @@ const Dashboard = ({ isOpen, userId }) => {
   const [bulanan, setBulanan] = useState([]);
   const [dateTime, setDateTime] = useState(new Date());
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,18 +29,19 @@ const Dashboard = ({ isOpen, userId }) => {
     if (!userId) {
       console.warn("User ID tidak tersedia. Mengarahkan ke halaman login.");
       navigate('/login');
-      return; 
+      return;
     }
   }, [userId, navigate]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Mengirim userId sebagai query parameter ke backend untuk setiap API
+        // Pastikan backend Anda merespons dengan struktur data yang sesuai
         const [saldoRes, incomeRes, expenseRes, bulananRes] = await Promise.all([
-          // Mengirim userId sebagai query parameter ke backend untuk setiap API
           fetch(`http://localhost:5000/api/transaksi/saldo?user_id=${userId}`).then((res) => res.json()),
           fetch(`http://localhost:5000/api/transaksi/incomes?user_id=${userId}`).then((res) => res.json()),
-          fetch(`http://localhost:5000/api/transaksi/expens?user_id=${userId}`).then((res) => res.json()),
+          fetch(`http://localhost:5000/api/transaksi/expens?user_id=${userId}`).then((res) => res.json()), // Perhatikan 'expens' mungkin typo, seharusnya 'expenses'
           fetch(`http://localhost:5000/api/transaksi/bulanan?user_id=${userId}`).then((res) => res.json()),
         ]);
 
@@ -71,8 +72,16 @@ const Dashboard = ({ isOpen, userId }) => {
     };
   });
 
-  if (loading && userId) return <p className="p-10">Memuat...</p>;
+  // Data untuk Pie Chart
+  const pieChartData = [
+    { name: "Pemasukan", value: incomes },
+    { name: "Pengeluaran", value: expenses },
+  ];
 
+  // Warna untuk Pie Chart
+  const PIE_COLORS = ['#2563EB', '#DC2626']; // Biru untuk Pemasukan, Merah untuk Pengeluaran
+
+  if (loading && userId) return <p className="p-10">Memuat...</p>;
   if (!userId) return null; // Atau tampilkan loading/pesan singkat sebelum redirect
 
   return (
@@ -144,33 +153,34 @@ const Dashboard = ({ isOpen, userId }) => {
             </div>
           </div>
 
-          {/* Pie Chart Pemasukan vs Pengeluaran */}
+          {/* Pie Chart Pemasukan vs Pengeluaran - YANG SUDAH DIPERBAIKI */}
           <div className="bg-white rounded-xl shadow p-10 flex flex-col items-center justify-center">
             <h2 className="text-center font-bold text-3xl">
               <span className="text-blue-700">Pemasukan</span> vs <span className="text-red-700">Pengeluaran</span>
             </h2>
-            <div className="w-full flex justify-center mt-4">
-              <div className="w-40 h-40 rounded-full overflow-hidden flex">
-                <div className="w-full flex justify-center mt-4">
-                  <PieChart width={160} height={160}>
-                    <Pie
-                      data={[
-                        { name: "Pemasukan", value: incomes },
-                        { name: "Pengeluaran", value: expenses },
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={0}
-                      dataKey="value"
-                    >
-                      <Cell key="pemasukan" fill="#2563EB" /> {/* biru */}
-                      <Cell key="pengeluaran" fill="#DC2626" /> {/* merah */}
-                    </Pie>
-                  </PieChart>
-                </div>
-              </div>
+            {/* Kontainer dengan tinggi eksplisit untuk ResponsiveContainer */}
+            <div style={{ width: '100%', height: 250 }}> {/* Atur tinggi ini sesuai kebutuhan */}
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieChartData} // Menggunakan data yang sudah disiapkan
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={0}
+                    dataKey="value"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  >
+                    {pieChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value, name) => [`Rp ${value.toLocaleString('id-ID')}`, name]} />
+                  {/* Anda bisa menambahkan <Legend /> di sini jika ingin keterangan di bawah chart */}
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>

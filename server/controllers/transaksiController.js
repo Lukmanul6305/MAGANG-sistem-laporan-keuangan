@@ -19,9 +19,9 @@ exports.getTransaksiSaldo = async (req, res) => {
                 SUM(CASE WHEN tipe = 'Pemasukan' THEN jumlah ELSE 0 END) -
                 SUM(CASE WHEN tipe = 'Pengeluaran' THEN jumlah ELSE 0 END) AS total_saldo
             FROM tb_transaksi
-            WHERE user_id = ? -- Filter berdasarkan user_id
+            WHERE user_id = ?
             `,
-      [user_id] // Masukkan user_id sebagai parameter kueri
+      [user_id]
     );
     res.json(result[0]);
   } catch (error) {
@@ -74,7 +74,7 @@ exports.getTransaksiBulanan = async (req, res) => {
                 SUM(CASE WHEN tipe = 'Pemasukan' THEN jumlah ELSE 0 END) AS total_pemasukan,
                 SUM(CASE WHEN tipe = 'Pengeluaran' THEN jumlah ELSE 0 END) AS total_pengeluaran
             FROM tb_transaksi
-            WHERE user_id = ? -- Filter berdasarkan user_id
+            WHERE user_id = ?
             GROUP BY DATE_FORMAT(tanggal, '%Y-%m')
             ORDER BY bulan
             `,

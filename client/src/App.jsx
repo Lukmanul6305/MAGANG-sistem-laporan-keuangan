@@ -103,7 +103,7 @@ function App() {
           element={
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <ProfilPage isOpen={isOpen} />
+              <ProfilPage isOpen={isOpen}  />
             </>
           }
         />
