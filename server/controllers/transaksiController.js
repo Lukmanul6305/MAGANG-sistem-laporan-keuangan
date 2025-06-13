@@ -280,3 +280,112 @@ exports.IPengeluaran = async (req, res) => {
     response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
   }
 };
+
+exports.getTransactions = async (req, res) => {
+    try {
+        const { userId } = req.params; // Mengambil userId dari URL parameter
+        const { search, tipe, kategori, metode, page = 1, limit = 10 } = req.query; // Query params
+
+        // Validasi dasar
+        if (!userId) {
+            return response(400, null, "User ID diperlukan.", res);
+        }
+
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+
+        let query = `
+            SELECT 
+                t.id, 
+                t.tanggal, 
+                t.tipe,       -- Ini akan menjadi 'Jenis' di frontend
+                k.nama_kategori AS kategori_nama, -- Mengambil nama kategori dari tb_kategori
+                t.jumlah, 
+                t.metode_pembayaran, 
+                t.description AS deskripsi -- Kolom description dari tb_transaksi
+            FROM tb_transaksi t
+            JOIN tb_kategori k ON t.kategori_id = k.id
+            WHERE t.user_id = ?
+        `;
+        let countQuery = `SELECT COUNT(t.id) AS totalItems FROM tb_transaksi t JOIN tb_kategori k ON t.kategori_id = k.id WHERE t.user_id = ?`;
+        
+        const queryParams = [userId];
+        const countParams = [userId];
+
+        // --- Logika Pencarian ---
+        if (search) {
+            const searchTermLower = `%${search.toLowerCase()}%`;
+            query += ` AND (LOWER(t.description) LIKE ? OR LOWER(t.tipe) LIKE ? OR t.jumlah LIKE ?)`;
+            countQuery += ` AND (LOWER(t.description) LIKE ? OR LOWER(t.tipe) LIKE ? OR t.jumlah LIKE ?)`;
+            queryParams.push(searchTermLower, searchTermLower, searchTermLower);
+            countParams.push(searchTermLower, searchTermLower, searchTermLower);
+        }
+
+        // --- Logika Filter ---
+        if (tipe) { // Filter berdasarkan jenis (Pemasukan/Pengeluaran)
+            query += ` AND t.tipe = ?`;
+            countQuery += ` AND t.tipe = ?`;
+            queryParams.push(tipe);
+            countParams.push(tipe);
+        }
+        if (kategori) { // Filter berdasarkan ID Kategori
+            query += ` AND t.kategori_id = ?`;
+            countQuery += ` AND t.kategori_id = ?`;
+            queryParams.push(kategori);
+            countParams.push(kategori);
+        }
+        if (metode) { // Filter berdasarkan metode pembayaran
+            query += ` AND t.metode_pembayaran = ?`;
+            countQuery += ` AND t.metode_pembayaran = ?`;
+            queryParams.push(metode);
+            countParams.push(metode);
+        }
+
+        query += ` ORDER BY t.tanggal DESC LIMIT ? OFFSET ?`;
+        queryParams.push(parseInt(limit), offset);
+
+        // Eksekusi query untuk mendapatkan data transaksi dan total item
+        const [transactions] = await db.query(query, queryParams);
+        const [totalItemsResult] = await db.query(countQuery, countParams);
+
+        const totalItems = totalItemsResult[0].totalItems;
+        const totalPages = Math.ceil(totalItems / parseInt(limit));
+
+        response(200, {
+            transactions: transactions,
+            totalItems: totalItems,
+            totalPages: totalPages,
+            currentPage: parseInt(page),
+            itemsPerPage: parseInt(limit),
+        }, "Daftar transaksi berhasil diambil.", res);
+
+    } catch (err) {
+        console.error("Error getting transactions:", err);
+        response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
+    }
+};
+
+// --- KONTROLER UNTUK HAPUS TRANSAKSI (DELETE /api/transaksi/:id) ---
+// Tambahkan juga fungsi ini untuk aksi hapus di frontend
+exports.deleteTransaction = async (req, res) => {
+    try {
+        const { id } = req.params; // ID transaksi dari URL parameter
+        // Anda mungkin ingin menambahkan verifikasi user_id di sini untuk keamanan
+        // const userId = req.session.userId; // Jika Anda masih pakai session
+        // const [checkTxn] = await db.query(`SELECT user_id FROM tb_transaksi WHERE id = ?`, [id]);
+        // if (checkTxn.length === 0 || checkTxn[0].user_id !== userId) {
+        //     return response(403, null, "Tidak diizinkan menghapus transaksi ini.", res);
+        // }
+
+        const [result] = await db.execute("DELETE FROM tb_transaksi WHERE id = ?", [id]);
+
+        if (result.affectedRows === 0) {
+            return response(404, null, "Transaksi tidak ditemukan.", res);
+        }
+
+        response(200, { success: true, message: "Transaksi berhasil dihapus." }, "Transaksi berhasil dihapus", res);
+
+    } catch (err) {
+        console.error("Error deleting transaction:", err);
+        response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
+    }
+};
