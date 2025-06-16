@@ -83,7 +83,7 @@ function App() {
           element={
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <DaftarTransaksi isOpen={isOpen} />
+              <DaftarTransaksi isOpen={isOpen} userId={userId} />
               <Profil />
             </>
           }

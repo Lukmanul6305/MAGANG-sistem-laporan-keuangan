@@ -40,3 +40,24 @@ exports.deleteKategori = async (req,res)=>{
         response(500,err,"gagal",res)
     }
 }
+
+exports.getCategoriesByUser = async (req, res) => {
+    try {
+        const { userId } = req.params; // Ambil userId dari parameter URL
+
+        if (!userId) {
+            return response(400, null, "User ID diperlukan.", res);
+        }
+
+        // Query untuk mengambil semua kategori unik milik seorang user
+        const sql = "SELECT id, nama_kategori, tipe FROM tb_kategori WHERE user_id = ?";
+        const [categories] = await db.query(sql, [userId]);
+
+        // Kirim data kategori sebagai respons
+        response(200, categories, "Daftar kategori berhasil diambil.", res);
+
+    } catch (err) {
+        console.error("Error getting categories:", err);
+        response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
+    }
+};
