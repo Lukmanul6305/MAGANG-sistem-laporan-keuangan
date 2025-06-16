@@ -262,7 +262,7 @@ exports.getTransactions = async (req, res) => {
                 k.nama_kategori AS kategori_nama,
                 t.jumlah, 
                 t.metode_pembayaran, 
-                t.deskripsi  -- KOREKSI: Menggunakan 'deskripsi' sesuai tabel
+                t.deskripsi
             FROM tb_transaksi t
             LEFT JOIN tb_kategori k ON t.kategori_id = k.id
             WHERE t.user_id = ?
@@ -337,17 +337,6 @@ exports.deleteTransaction = async (req, res) => {
         if (!id) {
             return response(400, null, "ID transaksi diperlukan.", res);
         }
-
-        // --- PENTING: Validasi Keamanan ---
-        // Sebelum menghapus, cek apakah transaksi ini milik user yang sedang login
-        // const [checkTxn] = await db.query(`SELECT user_id FROM tb_transaksi WHERE id = ?`, [id]);
-        // if (checkTxn.length === 0) {
-        //     return response(404, null, "Transaksi tidak ditemukan.", res);
-        // }
-        // if (checkTxn[0].user_id !== userId) {
-        //     return response(403, null, "Anda tidak diizinkan menghapus transaksi ini.", res);
-        // }
-        // ------------------------------------
 
         const [result] = await db.execute("DELETE FROM tb_transaksi WHERE id = ?", [id]);
 

@@ -179,9 +179,6 @@ const Dashboard = ({ isOpen }) => {
                 </div>
             </div>
         </div>
-
-        <footer className="mt-50 flex flex-col justify-center h-80 bg-gray-50">
-        </footer>
     </div>
   );
 };

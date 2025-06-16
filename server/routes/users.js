@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
-const { putUsers, deleteUser, putViaProfil } = require("../controllers/userController");
+const { putUsers, deleteUser, putViaProfil, getAllUsers } = require("../controllers/userController");
 const { Registrasi, login, getUsers, logout } = require("../controllers/authController");
 
 const validateUser = require("../middlewares/validateUser");
+
+router.get("/allUsers",getAllUsers)
 
 router.get("/users", getUsers);
 
