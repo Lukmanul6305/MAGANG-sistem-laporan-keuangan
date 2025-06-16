@@ -1,7 +1,9 @@
 const db = require("../../database/connection");
 const response = require("../utils/response");
 
-{"Halaman DASHBOARD"}
+{
+  ("Halaman DASHBOARD");
+}
 
 exports.getTransaksiSaldo = async (req, res) => {
   try {
@@ -37,10 +39,7 @@ exports.getTransaksiExpens = async (req, res) => {
     if (!user_id) {
       return res.status(400).json({ message: "User ID diperlukan." });
     }
-    const [result] = await db.query(
-      `SELECT SUM(jumlah) AS total_pengeluaran FROM tb_transaksi WHERE tipe = 'Pengeluaran' AND user_id = ?`,
-      [user_id]
-    );
+    const [result] = await db.query(`SELECT SUM(jumlah) AS total_pengeluaran FROM tb_transaksi WHERE tipe = 'Pengeluaran' AND user_id = ?`, [user_id]);
     res.json(result[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -53,10 +52,7 @@ exports.getTransaksiIncomes = async (req, res) => {
     if (!user_id) {
       return res.status(400).json({ message: "User ID diperlukan." });
     }
-    const [result] = await db.query(
-      `SELECT SUM(jumlah) AS total_pemasukan FROM tb_transaksi WHERE tipe = 'Pemasukan' AND user_id = ?`,
-      [user_id]
-    );
+    const [result] = await db.query(`SELECT SUM(jumlah) AS total_pemasukan FROM tb_transaksi WHERE tipe = 'Pemasukan' AND user_id = ?`, [user_id]);
     res.json(result[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -89,7 +85,9 @@ exports.getTransaksiBulanan = async (req, res) => {
   }
 };
 
-{"Halaman input pemasukan dan pengeluaran"}
+{
+  ("Halaman input pemasukan dan pengeluaran");
+}
 
 exports.IPemasukan = async (req, res) => {
   try {
@@ -105,7 +103,7 @@ exports.IPemasukan = async (req, res) => {
     }
     // Validasi lain seperti yang sudah ada
     if (!tanggal || !tipe || !jumlah || !nama_kategori || !metode_pembayaran) {
-        return res.status(400).json({ message: "Semua field wajib diisi (kecuali deskripsi)." });
+      return res.status(400).json({ message: "Semua field wajib diisi (kecuali deskripsi)." });
     }
 
     let kategori_id;
@@ -139,16 +137,7 @@ exports.IPemasukan = async (req, res) => {
             INSERT INTO tb_transaksi(user_id, kategori_id, tanggal, tipe, jumlah, metode_pembayaran, deskripsi, created_at)
             VALUES(?, ?, ?, ?, ?, ?, ?, ?)
         `;
-    const [transaksiResult] = await db.execute(sqlTransaksi, [
-      user_id,
-      kategori_id,
-      tanggal,
-      tipe,
-      jumlah,
-      metode_pembayaran,
-      deskripsi,
-      created_at,
-    ]);
+    const [transaksiResult] = await db.execute(sqlTransaksi, [user_id, kategori_id, tanggal, tipe, jumlah, metode_pembayaran, deskripsi, created_at]);
     console.log("Hasil penyimpanan transaksi:", transaksiResult);
 
     if (transaksiResult.affectedRows > 0) {
@@ -161,7 +150,7 @@ exports.IPemasukan = async (req, res) => {
     response(500, null, `Gagal menyimpan data: ${err.message}`, res);
   }
 };
-    
+
 exports.IPengeluaran = async (req, res) => {
   try {
     // Ambil data dari body request, termasuk user_id
@@ -176,17 +165,11 @@ exports.IPengeluaran = async (req, res) => {
     const nominalPengeluaran = parseFloat(jumlah); // Pastikan jumlah adalah angka
 
     // 1. Hitung total pemasukan untuk user_id ini
-    const [pemasukanResult] = await db.query(
-      `SELECT SUM(jumlah) AS total FROM tb_transaksi WHERE user_id = ? AND tipe = 'Pemasukan'`,
-      [user_id]
-    );
+    const [pemasukanResult] = await db.query(`SELECT SUM(jumlah) AS total FROM tb_transaksi WHERE user_id = ? AND tipe = 'Pemasukan'`, [user_id]);
     const totalPemasukan = pemasukanResult[0].total || 0; // Pastikan default 0 jika null
 
     // 2. Hitung total pengeluaran untuk user_id ini
-    const [pengeluaranResult] = await db.query(
-      `SELECT SUM(jumlah) AS total FROM tb_transaksi WHERE user_id = ? AND tipe = 'Pengeluaran'`,
-      [user_id]
-    );
+    const [pengeluaranResult] = await db.query(`SELECT SUM(jumlah) AS total FROM tb_transaksi WHERE user_id = ? AND tipe = 'Pengeluaran'`, [user_id]);
     const totalPengeluaran = pengeluaranResult[0].total || 0; // Pastikan default 0 jika null
 
     const saldoSaatIni = totalPemasukan - totalPengeluaran;
@@ -199,18 +182,12 @@ exports.IPengeluaran = async (req, res) => {
     let kategori_id;
 
     // 3. Cek atau buat kategori, pastikan kategori terikat user_id
-    const [existingKategoriRows] = await db.query(
-      `SELECT id FROM tb_kategori WHERE nama_kategori = ? AND tipe = ? AND user_id = ?`,
-      [nama_kategori, tipe, user_id]
-    );
+    const [existingKategoriRows] = await db.query(`SELECT id FROM tb_kategori WHERE nama_kategori = ? AND tipe = ? AND user_id = ?`, [nama_kategori, tipe, user_id]);
 
     if (existingKategoriRows.length > 0) {
       kategori_id = existingKategoriRows[0].id;
     } else {
-      const [newKategoriResult] = await db.execute(
-        `INSERT INTO tb_kategori(nama_kategori, tipe, user_id) VALUES (?,?,?)`,
-        [nama_kategori, tipe, user_id]
-      );
+      const [newKategoriResult] = await db.execute(`INSERT INTO tb_kategori(nama_kategori, tipe, user_id) VALUES (?,?,?)`, [nama_kategori, tipe, user_id]);
       kategori_id = newKategoriResult.insertId;
     }
 
@@ -241,144 +218,152 @@ exports.IPengeluaran = async (req, res) => {
   }
 };
 
-{"halaman daftar transaksi"}
+{
+  ("halaman daftar transaksi");
+}
 
 exports.getTransactions = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const { search, tipe, kategori, metode, page = 1, limit = 10 } = req.query;
+  try {
+    const { userId } = req.params;
+    const { search, tipe, kategori, metode, page = 1, limit = 10 } = req.query;
 
-        if (!userId) {
-            return response(400, null, "User ID diperlukan.", res);
-        }
-
-        const offset = (parseInt(page) - 1) * parseInt(limit);
-
-        let query = `
-            SELECT 
-                t.id, 
-                t.tanggal, 
-                t.tipe,
-                k.nama_kategori AS kategori_nama,
-                t.jumlah, 
-                t.metode_pembayaran, 
-                t.deskripsi
-            FROM tb_transaksi t
-            LEFT JOIN tb_kategori k ON t.kategori_id = k.id
-            WHERE t.user_id = ?
-        `;
-        let countQuery = `SELECT COUNT(t.id) AS totalItems FROM tb_transaksi t LEFT JOIN tb_kategori k ON t.kategori_id = k.id WHERE t.user_id = ?`;
-        
-        const queryParams = [userId];
-        const countParams = [userId];
-
-        // Logika Pencarian (hanya pada deskripsi untuk efisiensi)
-        if (search) {
-            const searchTermWildcard = `%${search}%`;
-            // KOREKSI: Menggunakan 'deskripsi' sesuai tabel
-            query += ` AND t.deskripsi LIKE ?`;
-            countQuery += ` AND t.deskripsi LIKE ?`;
-            queryParams.push(searchTermWildcard);
-            countParams.push(searchTermWildcard);
-        }
-
-        // Logika Filter
-        if (tipe) {
-            query += ` AND t.tipe = ?`;
-            countQuery += ` AND t.tipe = ?`;
-            queryParams.push(tipe);
-            countParams.push(tipe);
-        }
-        if (kategori) {
-            query += ` AND t.kategori_id = ?`;
-            countQuery += ` AND t.kategori_id = ?`;
-            queryParams.push(kategori);
-            countParams.push(kategori);
-        }
-        if (metode) {
-            query += ` AND t.metode_pembayaran = ?`;
-            countQuery += ` AND t.metode_pembayaran = ?`;
-            queryParams.push(metode);
-            countParams.push(metode);
-        }
-
-        query += ` ORDER BY t.tanggal DESC, t.id DESC LIMIT ? OFFSET ?`;
-        queryParams.push(parseInt(limit), offset);
-
-        // Eksekusi kedua query
-        const [transactions] = await db.query(query, queryParams);
-        const [totalResult] = await db.query(countQuery, countParams);
-        
-        const totalItems = totalResult[0].totalItems;
-        const totalPages = Math.ceil(totalItems / parseInt(limit));
-
-        const payload = {
-            transactions: transactions,
-            totalItems: totalItems,
-            totalPages: totalPages,
-            currentPage: parseInt(page),
-            itemsPerPage: parseInt(limit),
-        };
-
-        // Mengirim respons sesuai format yang diharapkan frontend: res.data.data
-        response(200, payload, "Daftar transaksi berhasil diambil.", res);
-
-    } catch (err) {
-        console.error("Error getting transactions:", err);
-        response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
+    if (!userId) {
+      return response(400, null, "User ID diperlukan.", res);
     }
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    let query = `
+      SELECT 
+        t.id, 
+        t.tanggal, 
+        t.tipe,
+        k.nama_kategori AS kategori_nama,
+        t.jumlah, 
+        t.metode_pembayaran, 
+        t.deskripsi
+      FROM tb_transaksi t
+      LEFT JOIN tb_kategori k ON t.kategori_id = k.id
+      WHERE t.user_id = ?
+    `;
+
+    let countQuery = `
+      SELECT COUNT(t.id) AS totalItems 
+      FROM tb_transaksi t 
+      LEFT JOIN tb_kategori k ON t.kategori_id = k.id 
+      WHERE t.user_id = ?
+    `;
+
+    const queryParams = [userId];
+    const countParams = [userId];
+
+    // Filter pencarian
+    if (search && search.trim() !== "") {
+      const searchTermWildcard = `%${search.trim()}%`;
+      query += ` AND t.deskripsi LIKE ?`;
+      countQuery += ` AND t.deskripsi LIKE ?`;
+      queryParams.push(searchTermWildcard);
+      countParams.push(searchTermWildcard);
+    }
+
+    // Filter berdasarkan tipe
+    if (tipe && tipe.trim() !== "") {
+      query += ` AND t.tipe = ?`;
+      countQuery += ` AND t.tipe = ?`;
+      queryParams.push(tipe.trim());
+      countParams.push(tipe.trim());
+    }
+
+    // Filter berdasarkan kategori
+    if (kategori && kategori.trim() !== "") {
+      query += ` AND t.kategori_id = ?`;
+      countQuery += ` AND t.kategori_id = ?`;
+      queryParams.push(kategori.trim());
+      countParams.push(kategori.trim());
+    }
+
+    // Filter berdasarkan metode
+    if (metode && metode.trim() !== "") {
+      query += ` AND t.metode_pembayaran = ?`;
+      countQuery += ` AND t.metode_pembayaran = ?`;
+      queryParams.push(metode.trim());
+      countParams.push(metode.trim());
+    }
+
+    query += ` ORDER BY t.tanggal DESC, t.id DESC LIMIT ? OFFSET ?`;
+    queryParams.push(parseInt(limit), offset);
+
+    // Eksekusi query
+    const [transactions] = await db.query(query, queryParams);
+    const [totalResult] = await db.query(countQuery, countParams);
+
+    const totalItems = totalResult[0].totalItems;
+    const totalPages = Math.ceil(totalItems / parseInt(limit));
+
+    const payload = {
+      transactions,
+      totalItems,
+      totalPages,
+      currentPage: parseInt(page),
+      itemsPerPage: parseInt(limit),
+    };
+
+    response(200, payload, "Daftar transaksi berhasil diambil.", res);
+  } catch (err) {
+    console.error("Error getting transactions:", err);
+    response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
+  }
 };
 
 exports.deleteTransaction = async (req, res) => {
-    try {
-        const { id } = req.params; // ID transaksi dari URL
-        // const userId = req.user.id; // AMBIL userId DARI TOKEN JWT ATAU SESSION
+  try {
+    const { id } = req.params; // ID transaksi dari URL
+    // const userId = req.user.id; // AMBIL userId DARI TOKEN JWT ATAU SESSION
 
-        if (!id) {
-            return response(400, null, "ID transaksi diperlukan.", res);
-        }
-
-        const [result] = await db.execute("DELETE FROM tb_transaksi WHERE id = ?", [id]);
-
-        if (result.affectedRows === 0) {
-            return response(404, null, "Transaksi tidak ditemukan atau sudah dihapus.", res);
-        }
-
-        response(200, null, "Transaksi berhasil dihapus.", res);
-
-    } catch (err) {
-        console.error("Error deleting transaction:", err);
-        response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
+    if (!id) {
+      return response(400, null, "ID transaksi diperlukan.", res);
     }
+
+    const [result] = await db.execute("DELETE FROM tb_transaksi WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return response(404, null, "Transaksi tidak ditemukan atau sudah dihapus.", res);
+    }
+
+    response(200, null, "Transaksi berhasil dihapus.", res);
+  } catch (err) {
+    console.error("Error deleting transaction:", err);
+    response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
+  }
 };
 
 exports.putTransaksi = async (req, res) => {
-    try {
-        // Pastikan Anda memvalidasi input dan user_id di sini juga
-        const { tipe, jumlah, deskripsi, tanggal, metode_pembayaran, kategori_id, id } = req.body;
-        const sql = "UPDATE tb_transaksi SET tipe = ?, jumlah = ?, description = ?, tanggal = ?, metode_pembayaran = ?, kategori_id = ? WHERE id = ?";
-        const [fields] = await db.execute(sql, [tipe, jumlah, deskripsi, tanggal, metode_pembayaran, kategori_id, id]);
+  try {
+    // Pastikan Anda memvalidasi input dan user_id di sini juga
+    const { tipe, jumlah, deskripsi, tanggal, metode_pembayaran, kategori_id, id } = req.body;
+    const sql = "UPDATE tb_transaksi SET tipe = ?, jumlah = ?, description = ?, tanggal = ?, metode_pembayaran = ?, kategori_id = ? WHERE id = ?";
+    const [fields] = await db.execute(sql, [tipe, jumlah, deskripsi, tanggal, metode_pembayaran, kategori_id, id]);
 
-        if (fields.affectedRows === 0) {
-            return response(404, null, "Transaksi tidak ditemukan untuk diupdate.", res);
-        }
-        
-        response(200, { updated: true }, "Update data berhasil", res);
-
-    } catch (err) {
-        console.error("Error updating transaction:", err);
-        response(500, err, "Update data gagal", res);
+    if (fields.affectedRows === 0) {
+      return response(404, null, "Transaksi tidak ditemukan untuk diupdate.", res);
     }
+
+    response(200, { updated: true }, "Update data berhasil", res);
+  } catch (err) {
+    console.error("Error updating transaction:", err);
+    response(500, err, "Update data gagal", res);
+  }
 };
 
-{"================"}
+{
+  ("================");
+}
 
 exports.postTransaksi = async (req, res) => {
   try {
     const { user_id, kategori_id, tipe, jumlah, deskripsi, tanggal, metode_pembayaran } = req.body;
     const created_at = new Date();
-    const sql =
-      "INSERT INTO tb_transaksi(user_id,kategori_id,tipe,jumlah,deskripsi,tanggal,metode_pembayaran,created_at) VALUES(?,?,?,?,?,?,?,?)";
+    const sql = "INSERT INTO tb_transaksi(user_id,kategori_id,tipe,jumlah,deskripsi,tanggal,metode_pembayaran,created_at) VALUES(?,?,?,?,?,?,?,?)";
     const [fields] = await db.execute(sql, [user_id, kategori_id, tipe, jumlah, deskripsi, tanggal, metode_pembayaran, created_at]);
     const data = {
       isSuccess: fields.affectedRows,
