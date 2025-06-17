@@ -13,8 +13,6 @@ import Profil from "./components/Profil";
 import ProfilPage from "./pages/ProfilPages";
 import HomePage from "./pages/HomePage";
 
-import NavbarAdmin from "./components/NavbarAdmin";
-import DashboardAdmin from "./pages/admin/DashboardAdmin";
 
 function App() {
   const [isOpen, setIsOpen] = useState(true);
@@ -39,15 +37,6 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route
-          path="/Admin"
-          element={
-            <>
-              <NavbarAdmin isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <DashboardAdmin isOpen={isOpen} />
-            </>
-          }
-        />
         <Route
           path="/dashboard"
           element={
@@ -93,7 +82,7 @@ function App() {
           element={
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <Laporan isOpen={isOpen} />
+              <Laporan isOpen={isOpen} userId={userId}/>
               <Profil />
             </>
           }
@@ -103,11 +92,12 @@ function App() {
           element={
             <>
               <Navbar isOpen={isOpen} animate={animate} handleToggle={handleToggle} />
-              <ProfilPage isOpen={isOpen} />
+              <ProfilPage isOpen={isOpen} userId={userId}/>
             </>
           }
         />
       </Routes>
+      
     </BrowserRouter>
   );
 }

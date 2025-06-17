@@ -233,72 +233,66 @@ exports.getTransactions = async (req, res) => {
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    let query = `
+    // 1. Siapkan kondisi WHERE dan parameter secara dinamis
+    const whereClauses = ['t.user_id = ?'];
+    const queryParams = [userId];
+
+    // --- PERBAIKAN UNTUK PENCARIAN CASE-INSENSITIVE ---
+if (search && search.trim() !== "") {
+  // 1. Ubah input pencarian menjadi huruf kecil dan tambahkan wildcard
+  const searchTermWildcard = `%${search.trim().toLowerCase()}%`; 
+  
+  // 2. Gunakan LOWER() pada kolom database dan gabungkan pencarian
+  whereClauses.push('(LOWER(t.deskripsi) LIKE ? OR LOWER(k.nama_kategori) LIKE ?)');
+  
+  // 3. Masukkan parameter dua kali (satu untuk deskripsi, satu untuk kategori)
+  queryParams.push(searchTermWildcard, searchTermWildcard);
+}
+    if (tipe && tipe.trim() !== "") {
+      whereClauses.push('t.tipe = ?');
+      queryParams.push(tipe.trim());
+    }
+    if (kategori && kategori.trim() !== "") {
+      whereClauses.push('t.kategori_id = ?');
+      queryParams.push(kategori.trim());
+    }
+    if (metode && metode.trim() !== "") {
+      whereClauses.push('t.metode_pembayaran = ?');
+      queryParams.push(metode.trim());
+    }
+
+    // 2. Gabungkan semua menjadi satu string SQL
+    const sql = `
       SELECT 
         t.id, 
         t.tanggal, 
         t.tipe,
+        t.kategori_id,
         k.nama_kategori AS kategori_nama,
         t.jumlah, 
         t.metode_pembayaran, 
-        t.deskripsi
+        t.deskripsi,
+        -- Menggunakan Window Function untuk menghitung total item tanpa query terpisah
+        COUNT(t.id) OVER() as totalItems
       FROM tb_transaksi t
       LEFT JOIN tb_kategori k ON t.kategori_id = k.id
-      WHERE t.user_id = ?
+      WHERE ${whereClauses.join(' AND ')}
+      ORDER BY t.tanggal DESC, t.id DESC
+      LIMIT ? OFFSET ?
     `;
 
-    let countQuery = `
-      SELECT COUNT(t.id) AS totalItems 
-      FROM tb_transaksi t 
-      LEFT JOIN tb_kategori k ON t.kategori_id = k.id 
-      WHERE t.user_id = ?
-    `;
-
-    const queryParams = [userId];
-    const countParams = [userId];
-
-    // Filter pencarian
-    if (search && search.trim() !== "") {
-      const searchTermWildcard = `%${search.trim()}%`;
-      query += ` AND t.deskripsi LIKE ?`;
-      countQuery += ` AND t.deskripsi LIKE ?`;
-      queryParams.push(searchTermWildcard);
-      countParams.push(searchTermWildcard);
-    }
-
-    // Filter berdasarkan tipe
-    if (tipe && tipe.trim() !== "") {
-      query += ` AND t.tipe = ?`;
-      countQuery += ` AND t.tipe = ?`;
-      queryParams.push(tipe.trim());
-      countParams.push(tipe.trim());
-    }
-
-    // Filter berdasarkan kategori
-    if (kategori && kategori.trim() !== "") {
-      query += ` AND t.kategori_id = ?`;
-      countQuery += ` AND t.kategori_id = ?`;
-      queryParams.push(kategori.trim());
-      countParams.push(kategori.trim());
-    }
-
-    // Filter berdasarkan metode
-    if (metode && metode.trim() !== "") {
-      query += ` AND t.metode_pembayaran = ?`;
-      countQuery += ` AND t.metode_pembayaran = ?`;
-      queryParams.push(metode.trim());
-      countParams.push(metode.trim());
-    }
-
-    query += ` ORDER BY t.tanggal DESC, t.id DESC LIMIT ? OFFSET ?`;
+    // 3. Tambahkan parameter untuk LIMIT dan OFFSET ke akhir array
     queryParams.push(parseInt(limit), offset);
 
-    // Eksekusi query
-    const [transactions] = await db.query(query, queryParams);
-    const [totalResult] = await db.query(countQuery, countParams);
+    // 4. Eksekusi query tunggal
+    const [results] = await db.query(sql, queryParams);
 
-    const totalItems = totalResult[0].totalItems;
+    // 5. Proses hasil
+    const totalItems = results.length > 0 ? results[0].totalItems : 0;
     const totalPages = Math.ceil(totalItems / parseInt(limit));
+
+    // Hapus properti 'totalItems' dari setiap objek transaksi sebelum dikirim ke client
+    const transactions = results.map(({ totalItems, ...rest }) => rest);
 
     const payload = {
       transactions,
@@ -309,6 +303,7 @@ exports.getTransactions = async (req, res) => {
     };
 
     response(200, payload, "Daftar transaksi berhasil diambil.", res);
+
   } catch (err) {
     console.error("Error getting transactions:", err);
     response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
@@ -339,19 +334,40 @@ exports.deleteTransaction = async (req, res) => {
 
 exports.putTransaksi = async (req, res) => {
   try {
-    // Pastikan Anda memvalidasi input dan user_id di sini juga
-    const { tipe, jumlah, deskripsi, tanggal, metode_pembayaran, kategori_id, id } = req.body;
-    const sql = "UPDATE tb_transaksi SET tipe = ?, jumlah = ?, description = ?, tanggal = ?, metode_pembayaran = ?, kategori_id = ? WHERE id = ?";
-    const [fields] = await db.execute(sql, [tipe, jumlah, deskripsi, tanggal, metode_pembayaran, kategori_id, id]);
+    // PERBAIKAN 1: Berikan nilai default 'null' atau nilai kosong untuk mencegah 'undefined'
+    const {
+      tipe = null,
+      jumlah = 0,
+      deskripsi = '',
+      tanggal = null,
+      metode_pembayaran = null,
+      kategori_id = null,
+      id
+    } = req.body;
+
+    // Tambahkan validasi untuk ID
+    if (!id) {
+        return response(400, null, "ID Transaksi diperlukan untuk update.", res);
+    }
+
+    // PERBAIKAN 2: Nama kolom 'description' diubah menjadi 'deskripsi' agar sesuai dengan database
+    const sql = "UPDATE tb_transaksi SET tipe = ?, jumlah = ?, deskripsi = ?, tanggal = ?, metode_pembayaran = ?, kategori_id = ? WHERE id = ?";
+    
+    const params = [tipe, jumlah, deskripsi, tanggal, metode_pembayaran, kategori_id, id];
+
+    // Eksekusi query dengan parameter yang sudah aman
+    const [fields] = await db.execute(sql, params);
 
     if (fields.affectedRows === 0) {
       return response(404, null, "Transaksi tidak ditemukan untuk diupdate.", res);
     }
 
     response(200, { updated: true }, "Update data berhasil", res);
+
   } catch (err) {
     console.error("Error updating transaction:", err);
-    response(500, err, "Update data gagal", res);
+    // Kirim pesan error yang lebih spesifik jika memungkinkan
+    response(500, { error: err.message }, "Update data gagal", res);
   }
 };
 

@@ -1,347 +1,272 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import iconProfil from "../assets/user.png"; // Pastikan path ini benar
-import iconKeluar from "../assets/shutdown.png"; // Pastikan path ini benar
 
-const ProfilPage = ({ isOpen, userId }) => {
-  // State untuk menyimpan semua data profil yang diambil dari backend
+// PERBAIKAN 1: Path impor gambar disesuaikan
+import iconProfil from "../assets/user.png";
+import iconKeluar from "../assets/shutdown.png";
+import defaultAvatar from "../assets/default-avatar.png";
+
+// Helper function untuk format Rupiah
+const formatRupiah = (number) => {
+  if (typeof number !== 'number') number = 0;
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(number);
+};
+
+const ProfilPage = ({ isOpen }) => {
+  // Ambil userId dari localStorage sebagai nilai awal
+  const [userId] = useState(localStorage.getItem("userId"));
+  
   const [profileData, setProfileData] = useState({
-    username: "", // Dari tb_users
-    email: "", // Dari tb_users
-    nomer: "", // Dari tb_users
-    alamat: "", // Dari tb_users
-    ulangTahun: "", // Dari tb_users
-    deskripsi: "", // Dari tb_transaksi (tipe 'DeskripsiProfil')
-    totalPemasukan: 0, // Agregasi dari tb_transaksi
-    totalPengeluaran: 0, // Agregasi dari tb_transaksi
+    username: localStorage.getItem("loggedInUsername") || "Pengguna",
+    email: "memuat...",
+    nomer: "",
+    alamat: "",
+    ulangTahun: "",
+    deskripsi: "",
+    foto_profil: defaultAvatar,
+    totalPemasukan: 0,
+    totalPengeluaran: 0,
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-
-  // --- PERUBAHAN UTAMA: State untuk nama tampilan, diambil dari localStorage duluan ---
-  const [displayName, setDisplayName] = useState(localStorage.getItem("loggedInUsername") || "Pengguna");
-  const [displayEmail, setDisplayEmail] = useState(localStorage.getItem("email") || "email belum tertampilkan");
-  // --- AKHIR PERUBAHAN ---
-
+  
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Konfigurasi Axios untuk mengirim credentials (tidak lagi mutlak jika tidak pakai session)
-  // Tapi biarkan saja untuk kompatibilitas jika nanti kembali ke session
-  axios.defaults.withCredentials = true;
-
-  // Fungsi untuk mengambil data profil dari backend
-  const fetchProfile = async () => {
-    console.log("Attempting to fetch profile for User ID:", userId);
-    try {
-      // Mengirim userId di URL (GET request)
-      const response = await axios.get(`http://localhost:5000/api/profile/${userId}`);
-      console.log("Profile fetch successful. Response data:", response.data);
-
-      const data = response.data.data; // Asumsi struktur { data: {...} }
-
-      setProfileData({
-        username: data.username || "",
-        email: data.email || "",
-        nomer: data.nomer || "",
-        alamat: data.alamat || "",
-        ulangTahun: data.ulangTahun ? new Date(data.ulangTahun).toISOString().split("T")[0] : "",
-        deskripsi: data.deskripsi || "",
-        totalPemasukan: data.totalPemasukan || 0,
-        totalPengeluaran: data.totalPengeluaran || 0,
-      });
-      // --- PERUBAHAN: Update nama tampilan setelah data backend didapatkan ---
-      setDisplayName(data.username || "Pengguna");
-      setDisplayEmail(data.email || "email tidak ada");
-      // --- AKHIR PERUBAHAN ---
-    } catch (error) {
-      console.error("Error fetching profile data. Details:", error.response || error.message || error);
-      alert(`Gagal memuat data profil: ${error.response?.data?.message || "Terjadi kesalahan."}`);
-      // Tidak perlu redirect ke login jika 401, karena tidak pakai session lagi secara ketat
-      // localStorage.removeItem('userId'); // Tidak perlu hapus, karena tidak dikelola ketat
-      // localStorage.removeItem('loggedInUsername');
-      // navigate("/login");
-    }
-  };
-
+  // PERBAIKAN 3: useEffect dibuat lebih efisien dan aman
   useEffect(() => {
-    if (userId) {
-      fetchProfile();
-    }
-  }, [userId, navigate]); // Dependensi `userId` akan memicu `useEffect` saat `userId` berubah.
+    const fetchProfile = async () => {
+      // Jika tidak ada userId (misal: user belum login), arahkan ke login
+      if (!userId) {
+        console.warn("User ID tidak ditemukan, mengarahkan ke halaman login.");
+        navigate("/login");
+        return;
+      }
 
-  const Logout = async () => {
-    // Logout sederhana, hanya hapus data lokal dan redirect
-    localStorage.removeItem("userId");
-    localStorage.removeItem("loggedInUsername");
+      setLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:5000/api/profile/${userId}`);
+        
+        // PERBAIKAN 2: Data dibaca langsung dari `response.data`
+        const data = response.data; 
+        
+        setProfileData({
+          username: data.username || "Pengguna",
+          email: data.email || "Tidak ada email",
+          nomer: data.nomer || "",
+          alamat: data.alamat || "",
+          ulangTahun: data.ulangTahun ? new Date(data.ulangTahun).toISOString().split("T")[0] : "",
+          deskripsi: data.deskripsi || "",
+          // Menambahkan alamat server ke path foto profil dari backend
+          foto_profil: data.foto_profil ? `http://localhost:5000${data.foto_profil}` : defaultAvatar,
+          totalPemasukan: data.totalPemasukan || 0,
+          totalPengeluaran: data.totalPengeluaran || 0,
+        });
+      } catch (error) {
+        console.error("Gagal memuat data profil:", error);
+        alert("Gagal memuat data profil. Pastikan server backend berjalan dan rute sudah benar.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProfile();
+  }, [userId, navigate]);
+
+  const handleLogout = () => {
+    localStorage.clear();
     navigate("/");
     alert("Berhasil keluar.");
-    // Tidak ada permintaan DELETE ke backend untuk logout jika tidak pakai sesi
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setProfileData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setProfileData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setProfileImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      alert("Silakan pilih file gambar.");
+    }
   };
 
   const handleUpdateProfile = async () => {
-    const payload = {
-      // userId: userId, // TIDAK PERLU DI PAYLOAD, SUDAH ADA DI URL PARAMETER
-      username: profileData.username,
-      email: profileData.email, // Email tidak akan diubah di backend via PUT ini
-      nomer: profileData.nomer,
-      alamat: profileData.alamat,
-      ulangTahun: profileData.ulangTahun,
-      deskripsi: profileData.deskripsi,
-    };
-    console.log("Sending update profile payload:", payload);
+    const formData = new FormData();
+    formData.append("username", profileData.username);
+    formData.append("nomer", profileData.nomer || '');
+    formData.append("alamat", profileData.alamat || '');
+    formData.append("ulangTahun", profileData.ulangTahun || '');
+    formData.append("deskripsi", profileData.deskripsi || '');
+    if (profileImageFile) {
+      formData.append("foto_profil", profileImageFile);
+    }
 
+    setLoading(true);
     try {
-      // Mengirim userId di URL (PUT request)
-      const response = await axios.put(`http://localhost:5000/api/profile/${userId}`, payload);
-      console.log("Response from /api/profile (PUT):", response.data);
-
-      setIsEditing(false); // Keluar dari mode edit setelah berhasil update
+      const response = await axios.put(`http://localhost:5000/api/profile/${userId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       alert(response.data.message || "Profil berhasil diperbarui!");
-      localStorage.setItem("loggedInUsername", profileData.username); // Update localStorage juga
-      fetchProfile(); // Refresh data setelah update
+      localStorage.setItem("loggedInUsername", profileData.username);
+      
+      setIsEditing(false);
+      setProfileImageFile(null);
+      setImagePreview(null);
+      
+      // Panggil ulang fetchProfile setelah update
+      const updatedProfileResponse = await axios.get(`http://localhost:5000/api/profile/${userId}`);
+      const updatedData = updatedProfileResponse.data;
+      setProfileData(prev => ({ ...prev, ...updatedData, foto_profil: updatedData.foto_profil ? `http://localhost:5000${updatedData.foto_profil}` : defaultAvatar }));
+
     } catch (error) {
-      console.error("Error updating profile. Details:", error.response || error.message || error);
-      const errorMessage = error.response?.data?.message || "Gagal memperbarui profil. Silakan coba lagi.";
-      alert(errorMessage);
+      console.error("Error updating profile:", error);
+      alert(error.response?.data?.message || "Gagal memperbarui profil.");
+    } finally {
+      // PERBAIKAN 4: Pastikan loading selalu false setelah selesai
+      setLoading(false);
     }
   };
 
   const handleChangePassword = async () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      alert("Semua field password harus diisi.");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      alert("Password baru dan konfirmasi password tidak cocok!");
-      return;
-    }
-    if (newPassword.length < 6) {
-      alert("Password baru minimal 6 karakter!");
-      return;
-    }
-
-    const payload = {
-      // userId: userId, // TIDAK PERLU DI PAYLOAD, SUDAH ADA DI URL PARAMETER
-      currentPassword,
-      newPassword,
-      confirmNewPassword: confirmPassword,
-    };
-    console.log("Sending change password payload:", payload);
-
+    if (newPassword !== confirmPassword) return alert("Password baru tidak cocok!");
+    if (newPassword.length < 6) return alert("Password baru minimal 6 karakter!");
     try {
-      // Mengirim userId di URL (PUT request)
-      const response = await axios.put(`http://localhost:5000/api/profile/${userId}/change-password`, payload);
-      console.log("Response from /api/profile/change-password:", response.data);
-
-      alert(response.data.message || "Password berhasil diganti!");
-      setCurrentPassword(""); // Kosongkan input password setelah berhasil
+      const response = await axios.put(`http://localhost:5000/api/profile/${userId}/change-password`, {
+        currentPassword, newPassword
+      });
+      alert(response.data.message || "Password berhasil diubah!");
+      setShowPasswordModal(false);
+      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setShowPasswordModal(false); // Tutup modal setelah berhasil
     } catch (error) {
-      console.error("Error changing password. Details:", error.response || error.message || error);
-      const errorMessage = error.response?.data?.message || "Gagal mengganti password. Silakan coba lagi.";
-      alert(errorMessage);
+      alert(error.response?.data?.message || "Gagal mengubah password.");
     }
   };
+  
+  if (loading) {
+    return <p className="p-10 text-center">Memuat profil...</p>
+  }
 
   return (
-    <div className={`flex flex-col p-10 transition-all duration-300 ease-in-out ${isOpen ? "lg:ml-70" : "lg:ml-20"} max-w-full`}>
-      {/* Bagian Atas Profil */}
-      <div className="flex justify-between items-start mb-10">
-        <div className="flex items-start">
-          <img src="https://images.icon-icons.com/2859/PNG/512/avatar_face_man_boy_profile_smiley_happy_people_icon_181659.png" className="w-40 h-40 bg-blue-200 rounded-full object-cover" alt="Profil Avatar" />
-          <div className="ml-5">
-            {/* Menggunakan displayName untuk nama tampilan utama */}
-            <h1 className="text-4xl font-bold">{displayName || "Nama Pengguna"}</h1>
-            {/* Informasi lainnya tetap dari profileData yang dimuat dari backend */}
-            <h6 className="text-lg">Email : {displayEmail || "Tidak ada email"}</h6>
-            <h6 className="text-lg">Nomer Telepon : {profileData.nomer || "Tidak ada telepon"}</h6>
-            <button onClick={() => setIsEditing(!isEditing)} className="p-2 bg-blue-600 rounded-2xl text-xs font-bold text-white mt-3 hover:bg-blue-700 transition duration-300">
-              {isEditing ? "Batal Edit" : "Edit Profil"}
-            </button>
-          </div>
+    <div className={`flex flex-col p-4 md:p-8 transition-all duration-300 ease-in-out ${isOpen ? "lg:ml-64" : "lg:ml-20"}`}>
+        <div className="flex flex-col sm:flex-row justify-between items-start mb-8 gap-6">
+            <div className="flex items-center">
+                <img src={imagePreview || profileData.foto_profil} className="w-32 h-32 bg-gray-200 rounded-full object-cover border-4 border-white shadow-lg" alt="Profil" />
+                <div className="ml-6">
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-800">{profileData.username}</h1>
+                    <p className="text-md text-gray-500">{profileData.email}</p>
+                    <p className="text-md text-gray-500">{profileData.nomer || "No. Telepon belum diatur"}</p>
+                    <button onClick={() => setIsEditing(!isEditing)} className="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-full mt-3 hover:bg-blue-700 transition duration-300 shadow">
+                        {isEditing ? "Batal" : "Edit Profil"}
+                    </button>
+                </div>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full sm:w-auto">
+                <div className="flex flex-col items-center p-4 shadow-md rounded-lg bg-blue-50 text-blue-800 min-w-[180px]">
+                    <span className="text-sm font-semibold">Total Pemasukan</span>
+                    <span className="text-xl font-bold">{formatRupiah(profileData.totalPemasukan)}</span>
+                </div>
+                <div className="flex flex-col items-center p-4 shadow-md rounded-lg bg-red-50 text-red-800 min-w-[180px]">
+                    <span className="text-sm font-semibold">Total Pengeluaran</span>
+                    <span className="text-xl font-bold">{formatRupiah(profileData.totalPengeluaran)}</span>
+                </div>
+            </div>
         </div>
-        <div className="flex flex-col gap-5 justify-center">
-          <div className="flex flex-col items-center p-5 shadow-md rounded-lg text-sm text-blue-600 font-bold bg-white min-w-[200px]">
-            Total Pemasukan<span className="text-xl">Rp {profileData.totalPemasukan.toLocaleString("id-ID")}</span>
-          </div>
-          <div className="flex flex-col items-center p-5 shadow-md rounded-lg text-sm text-blue-600 font-bold bg-white min-w-[200px]">
-            Total Pengeluaran <span className="text-xl">Rp {profileData.totalPengeluaran.toLocaleString("id-ID")}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Bagian Informasi Pribadi */}
-      <div className="mt-5 bg-gray-100 rounded p-5 shadow-md">
-        <div className="flex items-center gap-2 font-bold text-2xl mb-4">
-          <img src={iconProfil} className="w-12 p-1" alt="foto" />
-          Informasi Pribadi
-          <hr className="flex-grow border-t-2 border-gray-300" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-bold text-base">
-          <div>
-            <div className="mb-2">
-              <label className="block text-gray-700 text-sm font-bold mb-1">Nama:</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="username" // Name attribute cocok dengan properti state: profileData.username
-                  value={profileData.username}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              ) : (
-                <p className="p-2 bg-blue-50 rounded-md">{displayName || profileData.username}</p>
-              )}
+        <div className="bg-white rounded-lg p-6 shadow-md">
+            <h2 className="font-bold text-xl mb-4 border-b pb-2">Informasi Pribadi</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                <div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-1">Nama Pengguna</label>
+                        {isEditing ? (<input type="text" name="username" value={profileData.username} onChange={handleInputChange} className="w-full p-2 border rounded-md" />) : (<p className="p-2 bg-gray-100 rounded-md">{profileData.username}</p>)}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-1">Email</label>
+                        <p className="p-2 bg-gray-100 rounded-md text-gray-500">{profileData.email} (tidak dapat diubah)</p>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-1">No. Telepon</label>
+                        {isEditing ? (<input type="tel" name="nomer" value={profileData.nomer} onChange={handleInputChange} className="w-full p-2 border rounded-md" />) : (<p className="p-2 bg-gray-100 rounded-md">{profileData.nomer || "Belum diatur"}</p>)}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-1">Tanggal Lahir</label>
+                        {isEditing ? (<input type="date" name="ulangTahun" value={profileData.ulangTahun} onChange={handleInputChange} className="w-full p-2 border rounded-md" />) : (<p className="p-2 bg-gray-100 rounded-md">{profileData.ulangTahun || "Belum diatur"}</p>)}
+                    </div>
+                </div>
+                <div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-1">Alamat</label>
+                        {isEditing ? (<textarea name="alamat" value={profileData.alamat} onChange={handleInputChange} className="w-full p-2 border rounded-md h-24" />) : (<p className="p-2 bg-gray-100 rounded-md min-h-[96px] whitespace-pre-wrap">{profileData.alamat || "Belum diatur"}</p>)}
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-1">Deskripsi</label>
+                        {isEditing ? (<textarea name="deskripsi" value={profileData.deskripsi} onChange={handleInputChange} className="w-full p-2 border rounded-md h-24" />) : (<p className="p-2 bg-gray-100 rounded-md min-h-[96px] whitespace-pre-wrap">{profileData.deskripsi || "Tidak ada deskripsi"}</p>)}
+                    </div>
+                </div>
             </div>
-            <div className="mb-2">
-              <label className="block text-gray-700 text-sm font-bold mb-1">Email:</label>
-              <p className="p-2 bg-blue-50 rounded-md">{profileData.email || "Tidak ada data"}</p>
-            </div>
-            <div className="mb-2">
-              <label className="block text-gray-700 text-sm font-bold mb-1">Nomer Telepon:</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="nomer" // Name attribute cocok dengan properti state: profileData.nomer
-                  value={profileData.nomer}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              ) : (
-                <p className="p-2 bg-blue-50 rounded-md">{profileData.nomer || "Tidak ada data"}</p>
-              )}
-            </div>
-            <div className="mb-2">
-              <label className="block text-gray-700 text-sm font-bold mb-1">Alamat:</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="alamat" // Name attribute cocok dengan properti state: profileData.alamat
-                  value={profileData.alamat}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              ) : (
-                <p className="p-2 bg-blue-50 rounded-md">{profileData.alamat || "Tidak ada data"}</p>
-              )}
-            </div>
-            <div className="mb-2">
-              <label className="block text-gray-700 text-sm font-bold mb-1">Tanggal Lahir:</label>
-              {isEditing ? (
-                <input
-                  type="date"
-                  name="ulangTahun" // Name attribute cocok dengan properti state: profileData.ulangTahun
-                  value={profileData.ulangTahun}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              ) : (
-                <p className="p-2 bg-blue-50 rounded-md">{profileData.ulangTahun || "Tidak ada data"}</p>
-              )}
-            </div>
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-1">Deskripsi:</label>
-            {isEditing ? (
-              <textarea
-                name="deskripsi" // Name attribute cocok dengan properti state: profileData.deskripsi
-                value={profileData.deskripsi}
-                onChange={handleInputChange}
-                className="w-full bg-blue-100 p-2 rounded-2xl min-h-[150px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Silakan tulis deskripsi Anda"
-              />
-            ) : (
-              <p className="p-2 bg-blue-50 rounded-2xl min-h-[150px] whitespace-pre-wrap">{profileData.deskripsi || "Tidak ada deskripsi"}</p>
-            )}
             {isEditing && (
-              <button onClick={handleUpdateProfile} className="p-3 bg-green-600 rounded-md text-white font-bold mt-4 w-full hover:bg-green-700 transition duration-300">
-                Simpan Perubahan
-              </button>
+                <div className="mt-6 border-t pt-6">
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-1">Ganti Foto Profil</label>
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    </div>
+                    <div className="flex justify-end">
+                        <button onClick={handleUpdateProfile} className="px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition duration-300 shadow-lg">Simpan Perubahan</button>
+                    </div>
+                </div>
             )}
-          </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-        <div className="bg-gray-100 rounded p-5 shadow-md">
-          <div className="flex items-center gap-2 font-bold text-2xl mb-4">
-            <img src={iconProfil} className="w-12 p-1" alt="foto" />
-            Keamanan
-          </div>
-          <div className="flex justify-center text-sm">
-            <button onClick={() => setShowPasswordModal(true)} className="mt-5 p-3 font-bold text-white rounded-2xl bg-blue-600 hover:bg-blue-700 transition duration-300">
-              Ganti Password
-            </button>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="bg-white rounded-lg p-6 shadow-md text-center">
+                <h3 className="font-bold text-xl mb-2">Keamanan</h3>
+                <p className="text-sm text-gray-600 mb-4">Ubah password Anda secara berkala untuk menjaga keamanan akun.</p>
+                <button onClick={() => setShowPasswordModal(true)} className="px-5 py-2 font-bold text-white rounded-lg bg-blue-600 hover:bg-blue-700 transition duration-300">Ganti Password</button>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-md text-center">
+                <h3 className="font-bold text-xl mb-2">Tindakan Akun</h3>
+                <p className="text-sm text-gray-600 mb-4">Keluar dari sesi Anda saat ini.</p>
+                <button onClick={handleLogout} className="px-5 py-2 font-bold text-white rounded-lg bg-red-600 hover:bg-red-700 transition duration-300">Keluar</button>
+            </div>
         </div>
-        <div className="bg-gray-100 rounded p-5 shadow-md flex flex-col items-center justify-center">
-          <div className="flex justify-center p-3 font-bold text-2xl items-center mb-4">
-            <img src={iconKeluar} className="w-10 mr-1" alt="" />
-            Tindakan
-          </div>
-          <button onClick={Logout} className="p-3 w-40 font-bold text-white rounded-2xl bg-red-600 hover:bg-red-700 transition duration-300">
-            Keluar
-          </button>
-        </div>
-      </div>
-
-      {showPasswordModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-xl w-96">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Ganti Password</h2>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Password Saat Ini:</label>
-              <input
-                type="password"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-blue-500"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-              />
+        {showPasswordModal && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
+                <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-800">Ganti Password</h2>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Password Saat Ini:</label>
+                        <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="w-full p-2 border rounded-md" />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Password Baru:</label>
+                        <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full p-2 border rounded-md" />
+                    </div>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Konfirmasi Password Baru:</label>
+                        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full p-2 border rounded-md" />
+                    </div>
+                    <div className="flex justify-end gap-4">
+                        <button onClick={() => setShowPasswordModal(false)} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>
+                        <button onClick={handleChangePassword} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ganti Password</button>
+                    </div>
+                </div>
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Password Baru:</label>
-              <input
-                type="password"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-blue-500"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            </div>
-            <div className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Konfirmasi Password Baru:</label>
-              <input
-                type="password"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-blue-500"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-            <div className="flex justify-end gap-4">
-              <button onClick={() => setShowPasswordModal(false)} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
-                Batal
-              </button>
-              <button onClick={handleChangePassword} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
-                Ganti Password
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

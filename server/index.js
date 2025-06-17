@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("../database/connection");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const { route } = require("./routes/users");
 
 dotenv.config();
 const app = express();
@@ -15,6 +16,7 @@ const routes = [
   { path: "/kategori", route: require("./routes/kategori") },
   { path: "/transaksi", route: require("./routes/transaksi") },
   { path: "/laporan", route: require("./routes/laporan") },
+  { path: "/profile", route: require("./routes/profile") },
 ];
 
 routes.forEach((r) => app.use(`/api${r.path}`, r.route));
