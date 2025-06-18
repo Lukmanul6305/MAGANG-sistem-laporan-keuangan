@@ -27,6 +27,18 @@ exports.getTransaksiSaldo = async (req, res) => {
             `,
       [user_id]
     );
+    const calculatedData = result[0];
+    const total_saldo = calculatedData.total_saldo || 0;
+    await db.query(
+      `
+        UPDATE tb_users 
+        SET saldo = ? 
+        WHERE id = ?
+      `,
+      [total_saldo, user_id]
+    );
+
+
     res.json(result[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
