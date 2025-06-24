@@ -60,9 +60,8 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
               <Link
                 to={item.path}
                 onClick={() => handleMenuClick(item)}
-                // FIXED: Removed active link logic that depended on useLocation
                 className={`font-bold flex items-center p-2 rounded text-white cursor-pointer transition-all duration-200 bg-blue-500 hover:bg-blue-600
-                  ${isOpen ? "sm:w-70 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
+                  ${isOpen ? "sm:w-50 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
                 `}
               >
                 <span className="w-10 p-1">{item.icon}</span>
@@ -74,7 +73,7 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
                 onClick={() => setIsBuatOpen(!isBuatOpen)}
                 className={`font-bold flex items-center p-2 rounded text-white cursor-pointer transition-all duration-200 hover:bg-blue-600
                   ${isBuatOpen ? "bg-blue-800" : "bg-blue-500"}
-                  ${isOpen ? "sm:w-70 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
+                  ${isOpen ? "sm:w-50 sm:ml-10 sm:mr-10 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
                 `}
               >
                 <span className="w-10 p-1">{item.icon}</span>
@@ -86,7 +85,7 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
             {item.id === "buat" && isBuatOpen && (
               <div
                 className={`flex flex-col gap-3 p-3 bg-blue-400
-                  ${isOpen ? "absolute lg:w-50" : "fixed lg:left-20 top-auto bg-blue-500 rounded-r-lg p-0"}`}
+                  ${isOpen ? "absolute sm:left-10 sm:right-10 lg:w-50" : "fixed lg:left-20 top-auto bg-blue-500 rounded-r-lg p-0"}`}
               >
                 <Link to="/Pemasukan" onClick={() => setIsBuatOpen(false)} className={`flex items-center bg-blue-700 font-bold text-white rounded cursor-pointer hover:bg-blue-800 ${isOpen ? "lg:p-3" : "p-3 rounded-tr-lg rounded-br-none"}`}>
                   <img src="https://images.icon-icons.com/2313/PNG/512/wallet_payment_purchase_coin_cash_money_icon_141978.png" className="w-10 p-2" alt="Pemasukan" />

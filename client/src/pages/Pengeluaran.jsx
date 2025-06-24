@@ -84,9 +84,7 @@ const Pengeluaran = ({ isOpen, userId }) => { // userId diterima sebagai prop
 
   return (
     <div
-      className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${
-        isOpen ? "lg:ml-70" : "lg:ml-20"
-      } max-w-full`}
+      className={`flex flex-col p-5 md:p-8 transition-all duration-300 ease-in-out ${isOpen ? " sm:ml-66 ml-45 lg:ml-64" : "lg:ml-20 sm:ml-20 ml-20"}`}
     >
       <header className="flex w-full h-20 justify-between">
         <div className="flex flex-col justify-end">

@@ -248,7 +248,7 @@ const Laporan = ({ isOpen, userId }) => {
   }
 
   return (
-    <div className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${isOpen ? "lg:ml-70" : "lg:ml-20"}`}>
+    <div className={`flex flex-col p-5 md:p-8 transition-all duration-300 ease-in-out ${isOpen ? " sm:ml-66 ml-45 lg:ml-64" : "lg:ml-20 sm:ml-20 ml-20"}`}>
         {/* ... (Sisa kode JSX tidak perlu diubah) ... */}
          <div>
             <header className="mb-8">

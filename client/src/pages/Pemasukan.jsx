@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 // Tidak perlu lagi mengimpor useAuth di sini jika userId akan diterima sebagai prop
 
-const Pemasukan = ({ isOpen, userId }) => { // userId sekarang diterima sebagai prop
+const Pemasukan = ({ isOpen, userId }) => {
+  // userId sekarang diterima sebagai prop
   const [formData, setFormData] = useState({
     tanggal: "",
     tipe: "Pemasukan",
@@ -37,7 +38,6 @@ const Pemasukan = ({ isOpen, userId }) => { // userId sekarang diterima sebagai 
     }
   }, [userId]); // Dependensi userId agar efek ini berjalan jika userId berubah
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,7 +59,7 @@ const Pemasukan = ({ isOpen, userId }) => { // userId sekarang diterima sebagai 
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-        credentials: 'include', // PENTING: Untuk mengirim cookie sesi
+        credentials: "include", // PENTING: Untuk mengirim cookie sesi
       });
 
       const result = await res.json();
@@ -67,7 +67,7 @@ const Pemasukan = ({ isOpen, userId }) => { // userId sekarang diterima sebagai 
       if (res.ok) {
         showMessage("Pemasukan berhasil disimpan!", true);
         // Reset form, user_id tidak perlu direset karena dari prop
-        setFormData(prevFormData => ({
+        setFormData((prevFormData) => ({
           tanggal: "",
           tipe: "Pemasukan",
           jumlah: "",
@@ -90,11 +90,7 @@ const Pemasukan = ({ isOpen, userId }) => { // userId sekarang diterima sebagai 
   // if (!userId) return null; // Atau tampilkan pesan 'memuat' dari komponen induk
 
   return (
-    <div
-      className={`flex flex-col p-5 transition-all duration-300 ease-in-out ${
-        isOpen ? "lg:ml-70" : "lg:ml-20"
-      } max-w-full`}
-    >
+    <div className={`flex flex-col p-5 md:p-8 transition-all duration-300 ease-in-out ${isOpen ? " sm:ml-66 ml-45 lg:ml-64" : "lg:ml-20 sm:ml-20 ml-20"}`}>
       <header className="flex w-full h-20 justify-between">
         <div className="flex flex-col justify-end">
           <h1 className="text-red-700 font-bold text-4xl">Buat Pemasukan</h1>
@@ -103,61 +99,26 @@ const Pemasukan = ({ isOpen, userId }) => { // userId sekarang diterima sebagai 
       </header>
 
       {/* Area untuk menampilkan pesan notifikasi */}
-      {message && (
-        <div className={`p-3 my-4 rounded-lg text-white font-medium ${isSuccess ? "bg-green-500" : "bg-red-500"}`}>
-          {message}
-        </div>
-      )}
+      {message && <div className={`p-3 my-4 rounded-lg text-white font-medium ${isSuccess ? "bg-green-500" : "bg-red-500"}`}>{message}</div>}
       {/* Akhir area notifikasi */}
 
-      <h1 className="font-bold text-2xl flex w-full h-15 justify-center items-center">
-        Pemasukan Laporan Keuangan
-      </h1>
+      <h1 className="font-bold text-2xl flex w-full h-15 justify-center items-center">Pemasukan Laporan Keuangan</h1>
       <form className="flex flex-col gap-1" onSubmit={handleSubmit}>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Tanggal :</label>
-          <input
-            type="date"
-            value={formData.tanggal}
-            onChange={(e) =>
-              setFormData({ ...formData, tanggal: e.target.value })
-            }
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
-            required
-          />
+          <input type="date" value={formData.tanggal} onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })} className="border rounded-2xl p-2 text-xs text-gray-500 border-black" required />
         </div>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Jenis Transaksi :</label>
-          <input
-            type="text"
-            value="Pemasukan"
-            readOnly
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black bg-gray-100 cursor-not-allowed"
-          />
+          <input type="text" value="Pemasukan" readOnly className="border rounded-2xl p-2 text-xs text-gray-500 border-black bg-gray-100 cursor-not-allowed" />
         </div>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Nominal (Rp):</label>
-          <input
-            type="number"
-            placeholder="Masukkan nominal"
-            value={formData.jumlah}
-            onChange={(e) =>
-              setFormData({ ...formData, jumlah: e.target.value })
-            }
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
-            required
-          />
+          <input type="number" placeholder="Masukkan nominal" value={formData.jumlah} onChange={(e) => setFormData({ ...formData, jumlah: e.target.value })} className="border rounded-2xl p-2 text-xs text-gray-500 border-black" required />
         </div>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Kategori</label>
-          <select
-            value={formData.nama_kategori}
-            onChange={(e) =>
-              setFormData({ ...formData, nama_kategori: e.target.value })
-            }
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
-            required
-          >
+          <select value={formData.nama_kategori} onChange={(e) => setFormData({ ...formData, nama_kategori: e.target.value })} className="border rounded-2xl p-2 text-xs text-gray-500 border-black" required>
             <option value="">Pilih Kategori</option>
             <option value="Gaji">Gaji</option>
             <option value="Bonus">Bonus</option>
@@ -168,14 +129,7 @@ const Pemasukan = ({ isOpen, userId }) => { // userId sekarang diterima sebagai 
         </div>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Metode Pembayaran</label>
-          <select
-            value={formData.metode_pembayaran}
-            onChange={(e) =>
-              setFormData({ ...formData, metode_pembayaran: e.target.value })
-            }
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
-            required
-          >
+          <select value={formData.metode_pembayaran} onChange={(e) => setFormData({ ...formData, metode_pembayaran: e.target.value })} className="border rounded-2xl p-2 text-xs text-gray-500 border-black" required>
             <option value="">Pilih Metode</option>
             <option value="Transfer Bank">Transfer Bank</option>
             <option value="Tunai">Tunai</option>
@@ -189,17 +143,12 @@ const Pemasukan = ({ isOpen, userId }) => { // userId sekarang diterima sebagai 
             type="text"
             placeholder="Tambahkan deskripsi (opsional)"
             value={formData.deskripsi}
-            onChange={(e) =>
-              setFormData({ ...formData, deskripsi: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
             className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
           />
         </div>
         <div className="w-full flex justify-end items-end h-20">
-          <button
-            type="submit"
-            className="bg-blue-600 p-2 w-30 rounded-2xl text-white font-bold cursor-pointer"
-          >
+          <button type="submit" className="bg-blue-600 p-2 w-30 rounded-2xl text-white font-bold cursor-pointer">
             Buat
           </button>
         </div>
