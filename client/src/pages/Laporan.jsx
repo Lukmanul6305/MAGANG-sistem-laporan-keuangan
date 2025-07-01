@@ -236,7 +236,7 @@ const Laporan = ({ isOpen, userId }) => {
       {
         label: 'Jumlah',
         data: [summary?.totalPengeluaran || 0, summary?.totalPemasukan || 0],
-        backgroundColor: ['rgb(239, 68, 68)', 'rgb(59, 130, 246)'],
+        backgroundColor: ['rgb(239, 68, 68)', 'rgb(34, 197, 94)'],
         borderColor: '#ffffff',
         borderWidth: 2,
       },

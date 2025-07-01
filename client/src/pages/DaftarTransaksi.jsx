@@ -26,12 +26,6 @@ const EditTransactionModal = ({ transaction, onClose, onSave, categories }) => {
         <h2 className="text-2xl font-bold mb-4">Edit Transaksi</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="deskripsi">
-              Keterangan
-            </label>
-            <input type="text" id="deskripsi" name="deskripsi" value={formData.deskripsi} onChange={handleChange} className="w-full p-2 border rounded" required />
-          </div>
-          <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="jumlah">
               Jumlah (Nominal)
             </label>
@@ -43,7 +37,7 @@ const EditTransactionModal = ({ transaction, onClose, onSave, categories }) => {
             </label>
             <input type="date" id="tanggal" name="tanggal" value={formData.tanggal} onChange={handleChange} className="w-full p-2 border rounded" required />
           </div>
-          <div className="mb-4">
+                    <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="kategori_id">
               Kategori
             </label>
@@ -58,6 +52,11 @@ const EditTransactionModal = ({ transaction, onClose, onSave, categories }) => {
               ))}
             </select>
           </div>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="deskripsi">
+            <span>Keterangan</span>
+            <span className="text-xs text-gray-500 block">Tambahkan deskripsi transaksi</span>
+            <textarea id="deskripsi" name="deskripsi" value={formData.deskripsi} onChange={handleChange} className="w-full p-2 border rounded" rows="2" required />
+          </label>
           <div className="flex justify-end gap-4 mt-6">
             <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
               Batal

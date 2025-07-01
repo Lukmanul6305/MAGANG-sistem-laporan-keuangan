@@ -70,11 +70,12 @@ export default function Homepage() {
           {[
             { icon: "report-card", text: "Laporan Keuangan Otomatis" },
             { icon: "edit-file", text: "Input Transaksi Harian" },
-            { icon: "group", text: "Multi-user & Role" },
             { icon: "export", text: "Ekspor Data CSV / Excel" },
             { icon: "combo-chart", text: "Grafik & Visualisasi Keuangan" },
             { icon: "budget", text: "Pengelolaan Anggaran" },
-            { icon: "backup", text: "Backup & Restore Data" },
+            { icon: "calendar", text: "Laporan Bulanan" },
+            { icon: "calendar-13", text: "Laporan Harian" },
+            { icon: "calendar-7", text: "Laporan Mingguan" },
           ].map((fitur, index) => (
             <motion.div
               key={index}

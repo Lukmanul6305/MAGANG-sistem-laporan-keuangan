@@ -106,19 +106,19 @@ const Pemasukan = ({ isOpen, userId }) => {
       <form className="flex flex-col gap-1" onSubmit={handleSubmit}>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Tanggal :</label>
-          <input type="date" value={formData.tanggal} onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })} className="border rounded-2xl p-2 text-xs text-gray-500 border-black" required />
+          <input type="date" value={formData.tanggal} onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })} className="border rounded p-2 text-sm text-gray-500 border-black" required />
         </div>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Jenis Transaksi :</label>
-          <input type="text" value="Pemasukan" readOnly className="border rounded-2xl p-2 text-xs text-gray-500 border-black bg-gray-100 cursor-not-allowed" />
+          <input type="text" value="Pemasukan" readOnly className="border rounded p-2 text-sm text-gray-500 border-black bg-gray-100 cursor-not-allowed" />
         </div>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Nominal (Rp):</label>
-          <input type="number" placeholder="Masukkan nominal" value={formData.jumlah} onChange={(e) => setFormData({ ...formData, jumlah: e.target.value })} className="border rounded-2xl p-2 text-xs text-gray-500 border-black" required />
+          <input type="number" placeholder="Masukkan nominal" value={formData.jumlah} onChange={(e) => setFormData({ ...formData, jumlah: e.target.value })} className="border rounded p-2 text-sm text-gray-500 border-black" required />
         </div>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Kategori</label>
-          <select value={formData.nama_kategori} onChange={(e) => setFormData({ ...formData, nama_kategori: e.target.value })} className="border rounded-2xl p-2 text-xs text-gray-500 border-black" required>
+          <select value={formData.nama_kategori} onChange={(e) => setFormData({ ...formData, nama_kategori: e.target.value })} className="border rounded p-2 text-sm text-gray-500 border-black" required>
             <option value="">Pilih Kategori</option>
             <option value="Gaji">Gaji</option>
             <option value="Bonus">Bonus</option>
@@ -129,7 +129,7 @@ const Pemasukan = ({ isOpen, userId }) => {
         </div>
         <div className="flex flex-col">
           <label className="p-1 text-lg">Metode Pembayaran</label>
-          <select value={formData.metode_pembayaran} onChange={(e) => setFormData({ ...formData, metode_pembayaran: e.target.value })} className="border rounded-2xl p-2 text-xs text-gray-500 border-black" required>
+          <select value={formData.metode_pembayaran} onChange={(e) => setFormData({ ...formData, metode_pembayaran: e.target.value })} className="border rounded p-2 text-sm text-gray-500 border-black" required>
             <option value="">Pilih Metode</option>
             <option value="Transfer Bank">Transfer Bank</option>
             <option value="Tunai">Tunai</option>
@@ -144,11 +144,11 @@ const Pemasukan = ({ isOpen, userId }) => {
             placeholder="Tambahkan deskripsi (opsional)"
             value={formData.deskripsi}
             onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
+            className="border rounded p-2 text-sm text-gray-500 border-black"
           />
         </div>
         <div className="w-full flex justify-end items-end h-20">
-          <button type="submit" className="bg-blue-600 p-2 w-30 rounded-2xl text-white font-bold cursor-pointer">
+          <button type="submit" className="bg-blue-600 p-2 w-25 rounded text-white font-bold cursor-pointer">
             Buat
           </button>
         </div>

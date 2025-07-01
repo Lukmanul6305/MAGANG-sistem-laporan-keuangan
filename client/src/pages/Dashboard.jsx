@@ -98,7 +98,7 @@ const Dashboard = ({ isOpen }) => {
     { name: "Pemasukan", value: summary.incomes },
     { name: "Pengeluaran", value: summary.expenses },
   ];
-  const PIE_COLORS = ["#2563EB", "#DC2626"];
+  const PIE_COLORS = ["#22c55e", "#DC2626"];
 
   if (loading) {
     return <p className="p-10 text-center">Memuat data dashboard...</p>;
@@ -109,7 +109,7 @@ const Dashboard = ({ isOpen }) => {
       {/* Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <div>
-          <h1 className="text-4xl font-bold text-red-800">Dashboard</h1>
+          <h1 className="text-5xl font-bold text-red-500">Dashboard</h1>
           <p className="text-xs text-gray-500">
             {dateTime.toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} | {dateTime.toLocaleTimeString("id-ID")}
           </p>
@@ -122,15 +122,15 @@ const Dashboard = ({ isOpen }) => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
-          <h3 className="text-blue-500 font-semibold">Total Pemasukan</h3>
-          <p className="text-3xl font-bold text-blue-800 mt-2">{formatRupiah(summary.incomes)}</p>
+        <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+          <h3 className="text-green-500 font-semibold">Total Pemasukan</h3>
+          <p className="text-3xl font-bold text-green-600 mt-2">{formatRupiah(summary.incomes)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-red-500">
           <h3 className="text-red-500 font-semibold">Total Pengeluaran</h3>
-          <p className="text-3xl font-bold text-red-800 mt-2">{formatRupiah(summary.expenses)}</p>
+          <p className="text-3xl font-bold text-red-600 mt-2">{formatRupiah(summary.expenses)}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+        <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
           <h3 className="text-blue-500 font-semibold">Saldo Akhir</h3>
           <p className="text-3xl font-bold text-blue-500 mt-2">{formatRupiah(summary.saldo)}</p>
         </div>
@@ -151,15 +151,15 @@ const Dashboard = ({ isOpen }) => {
                 <Legend />
                 <defs>
                   <linearGradient id="colorPemasukan" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563EB" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#2563EB" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorPengeluaran" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#DC2626" stopOpacity={0.4} />
                     <stop offset="95%" stopColor="#DC2626" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <Line type="monotone" dataKey="Pemasukan" stroke="#2563EB" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="Pemasukan" stroke="#22c55e" strokeWidth={2} dot={false} />
                 <Line type="monotone" dataKey="Pengeluaran" stroke="#DC2626" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>

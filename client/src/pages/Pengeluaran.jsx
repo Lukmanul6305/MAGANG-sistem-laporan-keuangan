@@ -111,7 +111,7 @@ const Pengeluaran = ({ isOpen, userId }) => { // userId diterima sebagai prop
             type="date"
             value={formData.tanggal}
             onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })}
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
+            className="border rounded-sm p-2 text-sm text-gray-500 border-black"
             required
           />
         </div>
@@ -121,7 +121,7 @@ const Pengeluaran = ({ isOpen, userId }) => { // userId diterima sebagai prop
             type="text"
             value="Pengeluaran"
             readOnly
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black bg-gray-100 cursor-not-allowed"
+            className="border rounded-sm p-2 text-sm text-gray-500 border-black bg-gray-100 cursor-not-allowed"
           />
         </div>
         <div className="flex flex-col">
@@ -131,7 +131,7 @@ const Pengeluaran = ({ isOpen, userId }) => { // userId diterima sebagai prop
             placeholder="Masukkan Nominal"
             value={formData.jumlah}
             onChange={(e) => setFormData({ ...formData, jumlah: e.target.value })}
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
+            className="border rounded-sm p-2 text-sm text-gray-500 border-black"
             required
           />
         </div>
@@ -140,7 +140,7 @@ const Pengeluaran = ({ isOpen, userId }) => { // userId diterima sebagai prop
           <select
             value={formData.nama_kategori}
             onChange={(e) => setFormData({ ...formData, nama_kategori: e.target.value })}
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
+            className="border rounded-sm p-2 text-sm text-gray-500 border-black"
             required
           >
             <option value="">Pilih Kategori</option>
@@ -156,7 +156,7 @@ const Pengeluaran = ({ isOpen, userId }) => { // userId diterima sebagai prop
           <select
             value={formData.metode_pembayaran}
             onChange={(e) => setFormData({ ...formData, metode_pembayaran: e.target.value })}
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
+            className="border rounded-sm p-2 text-sm text-gray-500 border-black"
             required
           >
             <option value="">Pilih Metode</option>
@@ -173,11 +173,11 @@ const Pengeluaran = ({ isOpen, userId }) => { // userId diterima sebagai prop
             placeholder="Tambahkan deskripsi (opsional)"
             value={formData.deskripsi}
             onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
-            className="border rounded-2xl p-2 text-xs text-gray-500 border-black"
+            className="border rounded-sm p-2 text-sm text-gray-500 border-black"
           />
         </div>
         <div className="w-full flex justify-end items-end h-20">
-          <button type="submit" className="bg-blue-600 p-2 w-30 rounded-2xl text-white font-bold cursor-pointer">
+          <button type="submit" className="bg-blue-600 p-2 w-25 rounded-sm text-white font-bold cursor-pointer">
             Buat
           </button>
         </div>

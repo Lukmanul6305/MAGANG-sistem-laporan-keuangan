@@ -45,7 +45,7 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
 
   return (
     <nav
-      className={`h-screen bg-blue-700 rounded-r-[20px] flex flex-col items-center fixed transition-all duration-300 ease-in-out
+      className={`h-screen bg-blue-700 rounded-r-[8px] flex flex-col items-center fixed transition-all duration-300 ease-in-out
         ${isOpen ? "lg:w-70" : "lg:w-20"}`}
     >
       <button
@@ -56,11 +56,10 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
         {isOpen ? "SILAKU" : "$"}
       </button>
 
-      {/* ✅ Gambar Profil Dinamis */}
       <img
         src={
           fotoProfil ||
-          "https://images.icon-icons.com/2859/PNG/512/avatar_face_man_boy_profile_smiley_happy_people_icon_181659.png"
+          "https://images.icon-icons.com/1812/PNG/512/4213460-account-avatar-head-person-profile-user_115386.png"
         }
         className={`bg-gray-200 rounded-full border-white border object-cover transition-all duration-300 ease-in-out
           ${isOpen ? "w-30 h-30 mt-2" : "w-14 h-14 mt-2"}`}

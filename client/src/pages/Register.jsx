@@ -37,26 +37,11 @@ const Register = () => {
 
 return (
   <>
-    {/* Main Container: Centered on screen, covers full viewport height */}
     <div className="flex items-center justify-center min-h-screen p-4">
-      {/*
-        Content Wrapper:
-        - flex-col for mobile/tablet, lg:flex-row-reverse for desktop (form on left, image on right).
-        - w-full max-w-7xl ensures content doesn't stretch too wide.
-        - h-auto for mobile/tablet, lg:h-[90vh] for desktop to ensure columns stretch.
-        - lg:items-stretch ensures columns take full height of this container on desktop.
-        - lg:gap-8 provides horizontal spacing between the form and image.
-        - text-center for general alignment on smaller screens.
-      */}
       <div className="flex flex-col lg:flex-row-reverse text-center items-center justify-center w-full max-w-7xl h-auto lg:h-[90vh] lg:items-stretch lg:gap-8">
 
         {/* Right Section (Image and Title - now on the right in desktop due to flex-row-reverse) */}
         <div
-          // w-full for mobile, lg:w-1/2 for desktop.
-          // h-64 sm:h-80 md:h-96 for responsive height on smaller screens.
-          // lg:h-full ensures it takes full height of parent lg:h-[90vh] on desktop.
-          // rounded-3xl for rounded corners.
-          // mb-8 for spacing below image on mobile/tablet.
           className="flex items-center justify-center w-full lg:w-1/2 h-64 sm:h-80 md:h-96 lg:h-full rounded-3xl mb-8 lg:mb-0"
           style={{
             backgroundImage: `url('https://media.istockphoto.com/id/2035153356/id/foto/foto-stok-uang-kertas-rupiah.jpg?s=1024x1024&w=is&k=20&c=tDtpDRydAmb81z4e0KTSVgcG3oWNfVTQHUiekQ44_3c=')`,
@@ -67,20 +52,14 @@ return (
         >
           <p className="flex flex-col font-bold text-4xl sm:text-5xl lg:text-5xl gap-2 text-shadow-md p-4">
             <span>
-              <span className="text-blue-700 text-shadow-md">$</span>
-              <span className="text-red-700 text-shadow-md">LAKU</span>
+              <span className="text-red-700 text-shadow-md">$</span>
+              <span className="text-blue-700 text-shadow-md">LAKU</span>
             </span>
             SISTEM LAPORAN <br /> KEUANGAN
           </p>
         </div>
 
-        {/* Left Section (Registration Form - now on the left in desktop due to flex-row-reverse) */}
         <div
-          // w-full for mobile, lg:w-1/2 for desktop.
-          // h-full ensures it takes full height of parent.
-          // flex flex-col items-center for centering content horizontally on all screens.
-          // justify-center for vertical centering of content inside this column on all screens.
-          // gap-y-6 md:gap-y-8 lg:gap-y-10 for responsive vertical spacing.
           className="w-full lg:w-1/2 h-full flex flex-col gap-y-6 md:gap-y-8 lg:gap-y-10 items-center justify-center"
         >
           <div className="pt-4 md:pt-6 lg:pt-0 flex flex-col gap-2 w-full max-w-sm">

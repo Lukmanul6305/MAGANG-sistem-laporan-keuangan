@@ -5,7 +5,6 @@ import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Pemasukan from "./pages/Pemasukan";
-import Layout from "./components/Layout";
 import Pengeluaran from "./pages/Pengeluaran";
 import DaftarTransaksi from "./pages/DaftarTransaksi";
 import Laporan from "./pages/Laporan";

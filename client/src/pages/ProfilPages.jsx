@@ -4,7 +4,7 @@ import axios from "axios";
 
 import iconProfil from "../assets/user.png";
 import iconKeluar from "../assets/shutdown.png";
-import defaultAvatar from "../assets/default-avatar.png";
+import defaultAvatar from "../assets/default-avatar.webp";
 
 const formatRupiah = (number) => {
   if (typeof number !== "number") number = 0;
