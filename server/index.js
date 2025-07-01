@@ -3,6 +3,7 @@ const db = require("../database/connection");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const { route } = require("./routes/users");
+const path = require("path");
 
 dotenv.config();
 const app = express();
@@ -10,6 +11,8 @@ const port = 5000;
 
 app.use(cors({ credentials: true, origin: ["http://localhost:5173", "http://localhost:5174"] }));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 const routes = [
   { path: "/", route: require("./routes/users") },

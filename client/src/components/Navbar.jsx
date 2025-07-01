@@ -1,19 +1,34 @@
 import React, { useState, useEffect } from "react";
-// FIXED: Removed useLocation to prevent crash in preview environments.
-// Link is still needed for navigation.
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-// Terima 'name' sebagai prop dari App.jsx
 const Navbar = ({ isOpen, handleToggle, animate }) => {
   const [isBuatOpen, setIsBuatOpen] = useState(false);
-  // ADDED: State to hold the username
   const [name, setName] = useState("Pengguna");
+  const [fotoProfil, setFotoProfil] = useState(null);
 
-  // ADDED: useEffect to get username from localStorage when the component mounts
   useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
     const storedUsername = localStorage.getItem("loggedInUsername");
-    if (storedUsername) {
-      setName(storedUsername);
+
+    if (storedUsername) setName(storedUsername);
+
+    // Ambil data profil dari backend
+    if (storedUserId) {
+      axios
+        .get(`http://localhost:5000/api/profile/${storedUserId}`)
+        .then((res) => {
+          const data = res.data.payload;
+          if (data && data.foto_profil) {
+            setFotoProfil(`http://localhost:5000${data.foto_profil}`);
+          }
+          if (data && data.username) {
+            setName(data.username);
+          }
+        })
+        .catch((err) => {
+          console.error("Gagal memuat foto profil navbar:", err);
+        });
     }
   }, []);
 
@@ -24,11 +39,8 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
     { id: "keuangan", label: "Laporan Keuangan", icon: "📈", path: "/laporan" },
   ];
 
-  // Fungsi untuk menutup dropdown "Buat Laporan" jika area lain diklik
   const handleMenuClick = (item) => {
-    if (item.id !== "buat") {
-      setIsBuatOpen(false);
-    }
+    if (item.id !== "buat") setIsBuatOpen(false);
   };
 
   return (
@@ -44,14 +56,20 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
         {isOpen ? "SILAKU" : "$"}
       </button>
 
+      {/* ✅ Gambar Profil Dinamis */}
       <img
-        src="https://images.icon-icons.com/2859/PNG/512/avatar_face_man_boy_profile_smiley_happy_people_icon_181659.png"
-        className={`bg-red-500 rounded-full border-white border transition-all duration-300 ease-in-out
-          ${isOpen ? "w-30" : "w-15"}`}
+        src={
+          fotoProfil ||
+          "https://images.icon-icons.com/2859/PNG/512/avatar_face_man_boy_profile_smiley_happy_people_icon_181659.png"
+        }
+        className={`bg-gray-200 rounded-full border-white border object-cover transition-all duration-300 ease-in-out
+          ${isOpen ? "w-30 h-30 mt-2" : "w-14 h-14 mt-2"}`}
         alt="profil"
       />
 
-      <h1 className="p-7 font-bold md:text-1xl lg:text-2xl text-white transition-all duration-300 ease-in-out">{isOpen ? name : ""}</h1>
+      <h1 className="p-7 font-bold md:text-1xl lg:text-2xl text-white transition-all duration-300 ease-in-out">
+        {isOpen ? name : ""}
+      </h1>
 
       <div className="flex flex-col gap-3 items-center w-full">
         {menuItems.map((item) => (
@@ -61,42 +79,54 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
                 to={item.path}
                 onClick={() => handleMenuClick(item)}
                 className={`font-bold flex items-center p-2 rounded text-white cursor-pointer transition-all duration-200 bg-blue-500 hover:bg-blue-600
-                  ${isOpen ? "sm:w-50 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
-                `}
+                  ${isOpen ? "sm:w-50 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}`}
               >
                 <span className="w-10 p-1">{item.icon}</span>
                 {isOpen && item.label}
               </Link>
             ) : (
-              // "Buat Laporan" tetap menggunakan <button> karena fungsinya beda
               <button
                 onClick={() => setIsBuatOpen(!isBuatOpen)}
                 className={`font-bold flex items-center p-2 rounded text-white cursor-pointer transition-all duration-200 hover:bg-blue-600
                   ${isBuatOpen ? "bg-blue-800" : "bg-blue-500"}
-                  ${isOpen ? "sm:w-50 sm:ml-10 sm:mr-10 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}
-                `}
+                  ${isOpen ? "sm:w-50 sm:ml-10 sm:mr-10 sm:h-15 lg:w-50" : "w-fit h-fit justify-center"}`}
               >
                 <span className="w-10 p-1">{item.icon}</span>
                 {isOpen && item.label}
               </button>
             )}
 
-            {/* Logika dropdown "Buat Laporan" */}
             {item.id === "buat" && isBuatOpen && (
               <div
                 className={`flex flex-col gap-3 p-3 bg-blue-400
                   ${isOpen ? "absolute sm:left-10 sm:right-10 lg:w-50" : "fixed lg:left-20 top-auto bg-blue-500 rounded-r-lg p-0"}`}
               >
-                <Link to="/Pemasukan" onClick={() => setIsBuatOpen(false)} className={`flex items-center bg-blue-700 font-bold text-white rounded cursor-pointer hover:bg-blue-800 ${isOpen ? "lg:p-3" : "p-3 rounded-tr-lg rounded-br-none"}`}>
-                  <img src="https://images.icon-icons.com/2313/PNG/512/wallet_payment_purchase_coin_cash_money_icon_141978.png" className="w-10 p-2" alt="Pemasukan" />
+                <Link
+                  to="/Pemasukan"
+                  onClick={() => setIsBuatOpen(false)}
+                  className={`flex items-center bg-blue-700 font-bold text-white rounded cursor-pointer hover:bg-blue-800 ${
+                    isOpen ? "lg:p-3" : "p-3 rounded-tr-lg rounded-br-none"
+                  }`}
+                >
+                  <img
+                    src="https://images.icon-icons.com/2313/PNG/512/wallet_payment_purchase_coin_cash_money_icon_141978.png"
+                    className="w-10 p-2"
+                    alt="Pemasukan"
+                  />
                   {isOpen && "Pemasukan"}
                 </Link>
                 <Link
                   to="/Pengeluaran"
                   onClick={() => setIsBuatOpen(false)}
-                  className={`flex items-center bg-blue-700 font-bold text-white rounded cursor-pointer hover:bg-blue-800 ${isOpen ? "lg:p-3" : "p-3 rounded-br-lg rounded-tr-none"}`}
+                  className={`flex items-center bg-blue-700 font-bold text-white rounded cursor-pointer hover:bg-blue-800 ${
+                    isOpen ? "lg:p-3" : "p-3 rounded-br-lg rounded-tr-none"
+                  }`}
                 >
-                  <img src="https://images.icon-icons.com/550/PNG/512/business-color_money-coins_icon-icons.com_53446.png" className="w-10 p-2" alt="Pengeluaran" />
+                  <img
+                    src="https://images.icon-icons.com/550/PNG/512/business-color_money-coins_icon-icons.com_53446.png"
+                    className="w-10 p-2"
+                    alt="Pengeluaran"
+                  />
                   {isOpen && "Pengeluaran"}
                 </Link>
               </div>
@@ -105,7 +135,9 @@ const Navbar = ({ isOpen, handleToggle, animate }) => {
         ))}
       </div>
 
-      <footer className="text-white text-center text-sm pb-4 mt-auto">&copy; 2025 {name}</footer>
+      <footer className="text-white text-center text-sm pb-4 mt-auto">
+        &copy; 2025 {name}
+      </footer>
     </nav>
   );
 };

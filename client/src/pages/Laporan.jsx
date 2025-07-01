@@ -267,7 +267,7 @@ const Laporan = ({ isOpen, userId }) => {
                     <input type="date" name="periode_akhir" value={filters.periode_akhir} onChange={handleFilterChange} className="border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-indigo-500" />
                 </div>
                 <button onClick={handleGenerate} disabled={loading} className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 disabled:bg-indigo-300 transition-colors" >
-                    {loading ? 'Memuat...' : 'Generate'}
+                    {loading ? 'Memuat...' : 'Auto Generate Berhasil'}
                 </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
