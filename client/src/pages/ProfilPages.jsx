@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// PERBAIKAN 1: Path impor gambar disesuaikan
 import iconProfil from "../assets/user.png";
 import iconKeluar from "../assets/shutdown.png";
 import defaultAvatar from "../assets/default-avatar.png";
 
-// Helper function untuk format Rupiah
 const formatRupiah = (number) => {
   if (typeof number !== "number") number = 0;
   return new Intl.NumberFormat("id-ID", {
@@ -18,7 +16,6 @@ const formatRupiah = (number) => {
 };
 
 const ProfilPage = ({ isOpen }) => {
-  // Ambil userId dari localStorage sebagai nilai awal
   const [userId] = useState(localStorage.getItem("userId"));
 
   const [profileData, setProfileData] = useState({
@@ -45,12 +42,9 @@ const ProfilPage = ({ isOpen }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // PERBAIKAN 3: useEffect dibuat lebih efisien dan aman
   useEffect(() => {
     const fetchProfile = async () => {
-      // Jika tidak ada userId (misal: user belum login), arahkan ke login
       if (!userId) {
-        console.warn("User ID tidak ditemukan, mengarahkan ke halaman login.");
         navigate("/login");
         return;
       }
@@ -59,8 +53,8 @@ const ProfilPage = ({ isOpen }) => {
       try {
         const response = await axios.get(`http://localhost:5000/api/profile/${userId}`);
 
-        // PERBAIKAN 2: Data dibaca langsung dari `response.data`
-        const data = response.data;
+        // ✅ PERBAIKAN DI SINI
+        const data = response.data.payload;
 
         setProfileData({
           username: data.username || "Pengguna",
@@ -69,14 +63,13 @@ const ProfilPage = ({ isOpen }) => {
           alamat: data.alamat || "",
           ulangTahun: data.ulangTahun ? new Date(data.ulangTahun).toISOString().split("T")[0] : "",
           deskripsi: data.deskripsi || "",
-          // Menambahkan alamat server ke path foto profil dari backend
           foto_profil: data.foto_profil ? `http://localhost:5000${data.foto_profil}` : defaultAvatar,
           totalPemasukan: data.totalPemasukan || 0,
           totalPengeluaran: data.totalPengeluaran || 0,
         });
       } catch (error) {
         console.error("Gagal memuat data profil:", error);
-        alert("Gagal memuat data profil. Pastikan server backend berjalan dan rute sudah benar.");
+        alert("Gagal memuat data profil.");
       } finally {
         setLoading(false);
       }
@@ -121,22 +114,20 @@ const ProfilPage = ({ isOpen }) => {
       const response = await axios.put(`http://localhost:5000/api/profile/${userId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert(response.data.message || "Profil berhasil diperbarui!");
+      alert(response.data.pesan || "Profil berhasil diperbarui!");
       localStorage.setItem("loggedInUsername", profileData.username);
 
       setIsEditing(false);
       setProfileImageFile(null);
       setImagePreview(null);
 
-      // Panggil ulang fetchProfile setelah update
       const updatedProfileResponse = await axios.get(`http://localhost:5000/api/profile/${userId}`);
-      const updatedData = updatedProfileResponse.data;
+      const updatedData = updatedProfileResponse.data.payload;
       setProfileData((prev) => ({ ...prev, ...updatedData, foto_profil: updatedData.foto_profil ? `http://localhost:5000${updatedData.foto_profil}` : defaultAvatar }));
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert(error.response?.data?.message || "Gagal memperbarui profil.");
+      alert(error.response?.data?.pesan || "Gagal memperbarui profil.");
     } finally {
-      // PERBAIKAN 4: Pastikan loading selalu false setelah selesai
       setLoading(false);
     }
   };
@@ -149,22 +140,21 @@ const ProfilPage = ({ isOpen }) => {
         currentPassword,
         newPassword,
       });
-      alert(response.data.message || "Password berhasil diubah!");
+      alert(response.data.pesan || "Password berhasil diubah!");
       setShowPasswordModal(false);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      alert(error.response?.data?.message || "Gagal mengubah password.");
+      alert(error.response?.data?.pesan || "Gagal mengubah password.");
     }
   };
 
-  if (loading) {
-    return <p className="p-10 text-center">Memuat profil...</p>;
-  }
+  if (loading) return <p className="p-10 text-center">Memuat profil...</p>;
 
   return (
     <div className={`flex flex-col p-5 md:p-8 transition-all duration-300 ease-in-out ${isOpen ? " sm:ml-66 ml-45 lg:ml-64" : "lg:ml-20 sm:ml-20 ml-20"}`}>
+      {/* Profil Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start mb-8 gap-6">
         <div className="flex items-center">
           <img src={imagePreview || profileData.foto_profil} className="w-32 h-32 bg-gray-200 rounded-full object-cover border-4 border-white shadow-lg" alt="Profil" />
@@ -178,9 +168,12 @@ const ProfilPage = ({ isOpen }) => {
           </div>
         </div>
       </div>
+
+      {/* Form Edit */}
       <div className="bg-white rounded-lg p-6 shadow-md">
         <h2 className="font-bold text-xl mb-4 border-b pb-2">Informasi Pribadi</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+          {/* Kiri */}
           <div>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-1">Nama Pengguna</label>
@@ -207,6 +200,8 @@ const ProfilPage = ({ isOpen }) => {
               )}
             </div>
           </div>
+
+          {/* Kanan */}
           <div>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-1">Alamat</label>
@@ -226,6 +221,8 @@ const ProfilPage = ({ isOpen }) => {
             </div>
           </div>
         </div>
+
+        {/* Ganti Foto dan Tombol Simpan */}
         {isEditing && (
           <div className="mt-6 border-t pt-6">
             <div className="mb-4">
@@ -245,6 +242,8 @@ const ProfilPage = ({ isOpen }) => {
           </div>
         )}
       </div>
+
+      {/* Keamanan dan Logout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <div className="bg-white rounded-lg p-6 shadow-md text-center">
           <h3 className="font-bold text-xl mb-2">Keamanan</h3>
@@ -261,6 +260,8 @@ const ProfilPage = ({ isOpen }) => {
           </button>
         </div>
       </div>
+
+      {/* Modal Ganti Password */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
