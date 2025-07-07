@@ -152,61 +152,73 @@ const Laporan = ({ isOpen, userId }) => {
     handleGenerate();
   }, [handleGenerate]);
 
-  const handleExport = (format) => {
-    if (transactions.length === 0) {
-      alert("Tidak ada data untuk diekspor.");
-      return;
-    }
+  const handleExport = async (format) => {
+  if (transactions.length === 0) {
+    alert("Tidak ada data untuk diekspor.");
+    return;
+  }
 
-    if (format === 'excel') {
-      const dataToExport = transactions.map(t => ({
-        'Tanggal': new Date(t.tanggal).toLocaleDateString('id-ID'),
-        'Jenis': t.jenis || t.tipe,
-        'Kategori': t.kategori || t.kategori_nama,
-        'Pemasukan': (t.jenis === 'Pemasukan' || t.tipe === 'Pemasukan') ? (t.nominal || t.jumlah) : 0,
-        'Pengeluaran': (t.jenis === 'Pengeluaran' || t.tipe === 'Pengeluaran') ? (t.nominal || t.jumlah) : 0,
-        'Keterangan': t.keterangan || t.deskripsi,
-        'Saldo Akhir': t.saldoAkhir
-      }));
-      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Transaksi");
-      XLSX.writeFile(workbook, "Laporan_Keuangan.xlsx");
-    
-    } else if (format === 'pdf') {
-      const doc = new jsPDF();
-      doc.text("Laporan Keuangan", 14, 20);
-      doc.setFontSize(10);
-      doc.text(`Periode: ${new Date(filters.periode_awal).toLocaleDateString('id-ID')} s/d ${new Date(filters.periode_akhir).toLocaleDateString('id-ID')}`, 14, 26);
-      
-      // --- PERBAIKAN DI SINI ---
-      // Panggil autoTable sebagai fungsi, bukan sebagai method dari doc
-      autoTable(doc, {
-        startY: 35,
-        head: [['No', 'Tanggal', 'Keterangan', 'Kategori', 'Pemasukan', 'Pengeluaran']],
-        body: transactions.map((t, index) => [
-          index + 1,
-          new Date(t.tanggal).toLocaleDateString('id-ID'),
-          t.keterangan || t.deskripsi,
-          t.kategori || t.kategori_nama,
-          (t.jenis === 'Pemasukan' || t.tipe === 'Pemasukan') ? formatRupiah(t.nominal || t.jumlah) : '-',
-          (t.jenis === 'Pengeluaran' || t.tipe === 'Pengeluaran') ? formatRupiah(t.nominal || t.jumlah) : '-',
-        ]),
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [22, 160, 133] },
-      });
+  // Kirim data ke backend untuk dicatat di tb_laporan
+  try {
+    await axios.post('http://localhost:5000/api/laporan/log', {
+      user_id: userId,
+      jenis_laporan: filters.tipe,
+      periode_awal: filters.periode_awal,
+      priode_akhir: filters.periode_akhir,
+      format: format,
+    });
+    console.log('Laporan berhasil dicatat ke database');
+  } catch (error) {
+    console.error('Gagal mencatat laporan:', error);
+  }
 
-      const finalY = doc.lastAutoTable.finalY;
-      doc.setFontSize(10);
-      doc.text("Ringkasan:", 14, finalY + 10);
-      doc.text(`Total Pemasukan: ${formatRupiah(summary.totalPemasukan)}`, 14, finalY + 16);
-      doc.text(`Total Pengeluaran: ${formatRupiah(summary.totalPengeluaran)}`, 14, finalY + 22);
-      doc.setFont("helvetica", "bold");
-      doc.text(`Saldo Akhir: ${formatRupiah(summary.totalSaldo)}`, 14, finalY + 28);
+  // Lanjutkan proses export seperti biasa
+  if (format === 'excel') {
+    const dataToExport = transactions.map(t => ({
+      'Tanggal': new Date(t.tanggal).toLocaleDateString('id-ID'),
+      'Jenis': t.jenis || t.tipe,
+      'Kategori': t.kategori || t.kategori_nama,
+      'Pemasukan': (t.jenis === 'Pemasukan' || t.tipe === 'Pemasukan') ? (t.nominal || t.jumlah) : 0,
+      'Pengeluaran': (t.jenis === 'Pengeluaran' || t.tipe === 'Pengeluaran') ? (t.nominal || t.jumlah) : 0,
+      'Keterangan': t.keterangan || t.deskripsi,
+      'Saldo Akhir': t.saldoAkhir
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Transaksi");
+    XLSX.writeFile(workbook, "Laporan_Keuangan.xlsx");
+  } else if (format === 'pdf') {
+    const doc = new jsPDF();
+    doc.text("Laporan Keuangan", 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Periode: ${new Date(filters.periode_awal).toLocaleDateString('id-ID')} s/d ${new Date(filters.periode_akhir).toLocaleDateString('id-ID')}`, 14, 26);
 
-      doc.save("Laporan_Keuangan.pdf");
-    }
-  };
+    autoTable(doc, {
+      startY: 35,
+      head: [['No', 'Tanggal', 'Keterangan', 'Kategori', 'Pemasukan', 'Pengeluaran']],
+      body: transactions.map((t, index) => [
+        index + 1,
+        new Date(t.tanggal).toLocaleDateString('id-ID'),
+        t.keterangan || t.deskripsi,
+        t.kategori || t.kategori_nama,
+        (t.jenis === 'Pemasukan' || t.tipe === 'Pemasukan') ? formatRupiah(t.nominal || t.jumlah) : '-',
+        (t.jenis === 'Pengeluaran' || t.tipe === 'Pengeluaran') ? formatRupiah(t.nominal || t.jumlah) : '-',
+      ]),
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [22, 160, 133] },
+    });
+
+    const finalY = doc.lastAutoTable.finalY;
+    doc.setFontSize(10);
+    doc.text("Ringkasan:", 14, finalY + 10);
+    doc.text(`Total Pemasukan: ${formatRupiah(summary.totalPemasukan)}`, 14, finalY + 16);
+    doc.text(`Total Pengeluaran: ${formatRupiah(summary.totalPengeluaran)}`, 14, finalY + 22);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Saldo Akhir: ${formatRupiah(summary.totalSaldo)}`, 14, finalY + 28);
+
+    doc.save("Laporan_Keuangan.pdf");
+  }
+};
 
   const lineChartData = {
     labels: chartData.map((d, index) => `Minggu ${index + 1}`),

@@ -182,3 +182,19 @@ exports.getWeeklyChartData = async (req, res) => {
         response(500, null, `Terjadi kesalahan server: ${err.message}`, res);
     }
 };
+
+exports.exportLaporanLog  = async (req, res) => {
+  const { user_id, jenis_laporan, periode_awal, priode_akhir, format } = req.body;
+
+  try {
+    await db.query(`
+      INSERT INTO tb_laporan (user_id, jenis_laporan, periode_awal, priode_akhir, format, generated_at)
+      VALUES (?, ?, ?, ?, ?, NOW())
+    `, [user_id, jenis_laporan, periode_awal, priode_akhir, format]);
+
+    res.status(201).json({ message: 'Laporan berhasil disimpan' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Gagal menyimpan laporan' });
+  }
+};

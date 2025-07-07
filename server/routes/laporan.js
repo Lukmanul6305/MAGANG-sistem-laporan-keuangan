@@ -12,7 +12,8 @@ const {
     getLaporanSummary, 
     getLaporanTransaksi,
     generateLaporan,
-    getWeeklyChartData
+    getWeeklyChartData,
+    exportLaporanLog
 } = require('../controllers/laporanController');
 
 // Rute untuk mendapatkan 3 card ringkasan (saldo, pemasukan, pengeluaran)
@@ -23,6 +24,8 @@ router.get('/transaksi/:userId', getLaporanTransaksi);
 
 // Rute untuk men-trigger pembuatan laporan (PDF/Excel)
 router.post('/generate/:userId', generateLaporan);
+
+router.post('/log',exportLaporanLog);
 
 router.get('/chart/weekly/:userId', getWeeklyChartData);
 
