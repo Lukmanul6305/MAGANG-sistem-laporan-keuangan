@@ -99,7 +99,7 @@ exports.getLaporanTransaksi = async (req, res) => {
         const { tipe, periode_awal, periode_akhir } = req.query;
 
         let sql = `
-            SELECT t.id, t.tanggal, t.tipe AS jenis, k.nama_kategori AS kategori, t.jumlah AS nominal, t.metode_pembayaran AS metode, t.deskripsi AS keterangan
+            SELECT t.id, t.tanggal, t.tipe AS jenis, k.nama_kategori AS kategori, t.jumlah AS jumlah, t.metode_pembayaran AS metode, t.deskripsi AS keterangan
             FROM tb_transaksi t
             LEFT JOIN tb_kategori k ON t.kategori_id = k.id
             WHERE t.user_id = ?

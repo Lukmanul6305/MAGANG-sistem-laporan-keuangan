@@ -76,7 +76,7 @@ const Laporan = ({ isOpen, userId }) => {
     const validTransData = Array.isArray(transData) ? transData : [];
     
     const processedTransactions = validTransData.map(t => {
-      const nominal = Number(t.nominal) || Number(t.jumlah) || 0;
+      const nominal = Number(t.jumlah !== undefined ? t.jumlah : (t.nominal || 0));
       if (t.jenis === 'Pemasukan' || t.tipe === 'Pemasukan') {
         totalPemasukan += nominal;
         runningBalance += nominal;
@@ -322,10 +322,10 @@ const Laporan = ({ isOpen, userId }) => {
                                 <td className="p-3 text-gray-800 font-medium">{item.keterangan || item.deskripsi || 'N/A'}</td>
                                 <td className="p-3 text-gray-600">{item.kategori || item.kategori_nama}</td>
                                 <td className="p-3 text-green-600">
-                                {(item.jenis === 'Pemasukan' || item.tipe === 'Pemasukan') ? formatRupiah(item.nominal || item.jumlah) : '-'}
+                                  {item.jenis === 'Pemasukan' ? formatRupiah(Number(item.jumlah ?? item.nominal ?? 0)) : '-'}
                                 </td>
                                 <td className="p-3 text-red-600">
-                                {(item.jenis === 'Pengeluaran' || item.tipe === 'Pengeluaran') ? formatRupiah(item.nominal || item.jumlah) : '-'}
+                                  {item.jenis === 'Pengeluaran' ? formatRupiah(Number(item.jumlah ?? item.nominal ?? 0)) : '-'}
                                 </td>
                                 <td className="p-3 text-gray-800 font-medium">{formatRupiah(item.saldoAkhir)}</td>
                             </tr>
