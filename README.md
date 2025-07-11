@@ -25,4 +25,4 @@ Profil
 
 dan fitur lainnya
 
-NOTE : Jangan menjual projek ini,jangan melakukan plagiat dan lain yang merugikan!!
+NOTE : Jangan menjual projek ini,jangan melakukan plagiat dan lainnya yang merugikan!!
