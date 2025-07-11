@@ -20,6 +20,9 @@ laporan keuangan
 <img width="1354" height="607" alt="laporanbulanan" src="https://github.com/user-attachments/assets/8b3e4d84-c770-4847-8ad9-22842b716d07" />
 <img width="1354" height="605" alt="laporanbulanan2" src="https://github.com/user-attachments/assets/f7eae8f1-e620-439a-abca-1c567513ee50" />
 
+Profil
+<img width="1366" height="608" alt="image" src="https://github.com/user-attachments/assets/b7f63ad9-45d4-44cf-8c35-26e452490e8e" />
+
 dan fitur lainnya
 
 NOTE : Jangan menjual projek ini!!
