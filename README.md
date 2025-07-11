@@ -1,3 +1,5 @@
+"Proyek ini dipublikasikan di GitHub sebagai dokumentasi hasil kerja saya secara pribadi dan sebagai portofolio terbuka."
+
 Home page
 <img width="1355" height="607" alt="homepage" src="https://github.com/user-attachments/assets/b8fa0717-3032-4076-855d-dc4af06e6a5d" />
 
@@ -23,6 +25,6 @@ laporan keuangan
 Profil
 <img width="1366" height="608" alt="image" src="https://github.com/user-attachments/assets/b7f63ad9-45d4-44cf-8c35-26e452490e8e" />
 
-dan fitur lainnya
+dan fitur lainnya...
 
 NOTE : Jangan menjual projek ini,jangan melakukan plagiat dan lainnya yang merugikan!!
